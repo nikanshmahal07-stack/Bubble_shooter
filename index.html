@@ -22,14 +22,14 @@ canvas{background:linear-gradient(#7EC8FF,#E0F7FF);border:3px solid #fff;border-
 .btns{display:none;justify-content:center;gap:8px;margin-top:5px}
 button{padding:10px 14px;border:none;border-radius:25px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
 #back{margin-top:10px;background:#fff;padding:8px 20px;border-radius:20px;font-weight:900;border:none}
-#msg{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;color:#fff;text-shadow:3px 3px 0 #000;display:none;z-index:99}
+#msg{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);font-size:30px;font-weight:900;color:#fff;text-shadow:3px 3px 0 #000;display:none;z-index:99}
 </style>
 </head>
 <body>
 <div id="msg">💣 BOOM!</div>
 <div class="logo"><div class="logo-icon">🫧</div><div><h1><span>BUBBLE</span> SHOOTER</h1><p>⭐ PRO VERSION - 50 LEVELS ⭐</p></div><div class="logo-icon" style="background:linear-gradient(#00E676,#2979FF)">🐱</div></div>
 <div class="top"><span>⭐ <b id="stars">0</b></span><span>🪙 <b id="coins">100</b></span><span>🔥 COMBO: <b id="combo">0</b></span><span>🔊 <b id="sndBtn" onclick="toggleSound()" style="cursor:pointer">ON</b></span></div>
-<div id="mapScreen"><h2 style="color:#fff;text-shadow:2px 2px 0 #000;margin:8px">🗺️ LEVEL CHUNO 🗺️</h2><div id="map"></div><p style="color:#fff;font-weight:bold;font-size:12px">🏹 Arrow se Aim karo | ⬇️ Latke Bubble Girenge | 🔥 5 Combo = Fireball</p></div>
+<div id="mapScreen"><h2 style="color:#fff;text-shadow:2px 2px 0 #000;margin:8px">🗺️ LEVEL CHUNO 🗺️</h2><div id="map"></div><p style="color:#fff;font-weight:bold;font-size:12px">🏹 Lamba Arrow Ball tak jayega | 👆 Halka Touch = Blast</p></div>
 <canvas id="c" width="360" height="500"></canvas>
 <div class="btns" id="btns"><button style="background:#FF5252;color:#fff" onclick="useBomb()">💣 BOMB</button><button style="background:#448AFF;color:#fff" onclick="changeColor()">🎨 COLOUR</button><button style="background:#00E676" onclick="showMap()">🗺️ MAP</button></div>
 <button id="back" onclick="showMap()" style="display:none">⬅ BACK TO MAP</button>
@@ -55,7 +55,7 @@ var cv=document.getElementById("c"), ctx=cv.getContext("2d");
 var COL=["#FF3D00","#2979FF","#00C853","#FFEA00","#D500F9","#00BCD4"];
 var R=17, COLS=9, grid=[], score=0, level=1, moves=30, coins=100, stars=0, unlocked=1, combo=0, fireballNext=false;
 var shooter={x:180,y:435,c:COL[0],n:COL[1]};
-var bullet=null, aimX=180, aimY=100, aiming=false, falling=[], particles=[];
+var bullet=null, aimX=180, aimY=100, aiming=false, falling=[];
 var aimAngle=-Math.PI/2;
 
 function buildMap(){ var m=document.getElementById("map"); m.innerHTML=""; for(var i=1;i<=50;i++){ var b=document.createElement("button"); b.className="lvl "+(i<unlocked?"open": i==unlocked?"cur":"lock"); b.innerText=i<=unlocked?i:"🔒"; if(i<=unlocked){ (function(l){ b.onclick=function(){ startLevel(l); }; })(i); } m.appendChild(b); } }
@@ -76,28 +76,54 @@ function drawB(x,y,c,isFire){
   ctx.beginPath(); ctx.arc(x-5,y-6,5,0,7); ctx.fillStyle="rgba(255,255,255,.7)"; ctx.fill();
   if(isFire){ ctx.font="16px Arial"; ctx.fillText("🔥",x-8,y+6); }
 }
+
+// ===== ARROW BALL TAK JAYEGA - YE FUNCTION CALCULATE KARTA HAI =====
+function getArrowEnd(){
+  var sx=shooter.x, sy=shooter.y-18;
+  var dx=Math.cos(aimAngle), dy=Math.sin(aimAngle);
+  var x=sx, y=sy;
+  // Step by step aage badho jab tak Ball ya Deewar na mile
+  for(var i=0;i<400;i++){
+    x+=dx*4; y+=dy*4;
+    if(x<18||x>342||y<28){ break; } // deewar
+    var hit=false;
+    for(var gy=0;gy<grid.length;gy++) for(var gx=0;gx<COLS;gx++){
+      if(!grid[gy]||!grid[gy][gx]) continue;
+      var p=P(gx,gy);
+      if(Math.hypot(x-p.px,y-p.py)<R+8){ hit=true; break; }
+    }
+    if(hit) break;
+  }
+  return {x:x,y:y};
+}
+
 function draw(){
   if(cv.style.display=="none") return;
   ctx.clearRect(0,0,360,500);
   ctx.font="18px Arial"; ctx.fillText("☁️",20,20); ctx.fillText("☁️",300,15);
   ctx.fillStyle="#333"; ctx.font="bold 13px Arial"; ctx.fillText("LEVEL "+level+"  |  Moves: "+moves+"  |  Score: "+score, 70, 20);
-  // ==== ARROW GHUMEGA ====
-  // Dotted line + Arrow head jo Aim ke saath ghumta hai
-  ctx.save(); ctx.translate(shooter.x, shooter.y-18); ctx.rotate(aimAngle+Math.PI/2);
-  ctx.setLineDash([6,6]); ctx.strokeStyle= fireballNext?"#FF3D00":"rgba(255,255,255,.9)"; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-70); ctx.stroke(); ctx.setLineDash([]);
-  // Arrow ka teer
-  ctx.fillStyle= fireballNext?"#FF3D00":"#fff"; ctx.beginPath(); ctx.moveTo(0,-85); ctx.lineTo(-8,-70); ctx.lineTo(8,-70); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle="#333"; ctx.stroke();
-  ctx.restore();
+
+  // ===== LAMBA ARROW - BALL TAK =====
+  if(aiming || true){
+    var end=getArrowEnd();
+    var sx=shooter.x, sy=shooter.y-18;
+    // Dotted line poori ball tak
+    ctx.save();
+    ctx.setLineDash([8,7]); ctx.strokeStyle= fireballNext?"#FF3D00":"rgba(255,255,255,.95)"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(end.x,end.y); ctx.stroke(); ctx.setLineDash([]);
+    // Arrow ka teer end pe
+    var ang=Math.atan2(end.y-sy,end.x-sx);
+    ctx.translate(end.x,end.y); ctx.rotate(ang);
+    ctx.fillStyle= fireballNext?"#FF3D00":"#fff"; ctx.strokeStyle="#333"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(14,0); ctx.lineTo(-2,-8); ctx.lineTo(-2,8); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // End pe chhota target circle
+    ctx.beginPath(); ctx.arc(0,0,6,0,7); ctx.fillStyle= fireballNext?"#FF3D00":shooter.c; ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
 
   for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){ if(!grid[y][x]) continue; var p=P(x,y); drawB(p.px,p.py,grid[y][x],false); }
-  // Girte hue bubble
   falling.forEach(f=>{ drawB(f.x,f.y,f.c,false); });
-  // Particles
-  particles.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fillStyle=p.c; ctx.fill(); });
   ctx.font="48px Arial"; ctx.fillText("🐱",152,495);
-  // Shooter - Fireball ho to Aag wala
   if(fireballNext){ drawB(shooter.x,shooter.y-18,"#FF3D00",true); } else { drawB(shooter.x,shooter.y-18,shooter.c,false); }
   drawB(315,460,shooter.n,false);
   ctx.fillStyle="#333"; ctx.font="bold 10px Arial"; ctx.fillText("NEXT",303,485);
@@ -111,21 +137,39 @@ function shoot(){
   var isFire=fireballNext;
   if(isFire){ playSound('fire'); showMsg("🔥 FIREBALL!"); fireballNext=false; }
   else playSound('shoot');
-  bullet={x:shooter.x,y:shooter.y-18,c: isFire?"#FF3D00":shooter.c,dx:Math.cos(ang)*7,dy:Math.sin(ang)*7, isFire:isFire};
+  bullet={x:shooter.x,y:shooter.y-18,c: isFire?"#FF3D00":shooter.c,dx:Math.cos(ang)*7.5,dy:Math.sin(ang)*7.5, isFire:isFire};
   shooter.c=shooter.n; shooter.n=COL[Math.floor(Math.random()*COL.length)];
   moves--;
 }
 function place(){
+  // ===== TOUCH WALA SYSTEM - Halka Touch bhi kaafi hai =====
+  // Pehle dekho bullet kis Ball se touch hui
+  var touchX=-1, touchY=-1, minD=999;
+  for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){
+    if(!grid[y]||!grid[y][x]) continue;
+    var p=P(x,y);
+    var d=Math.hypot(bullet.x-p.px,bullet.y-p.py);
+    if(d<minD){ minD=d; touchX=x; touchY=y; }
+  }
+  // Sabse paas wali khaali jagah dhoondo (Touch wali ke aas paas)
   var best=null, bd=99999;
-  for(var y=0;y<12;y++) for(var x=0;x<COLS;x++){ var p=P(x,y); var d=Math.hypot(bullet.x-p.px,bullet.y-p.py); if(d<bd){bd=d;best={x:x,y:y};} }
-  var wasFire=bullet.isFire;
-  if(best){ if(!grid[best.y]) grid[best.y]=[]; 
+  for(var y=0;y<12;y++) for(var x=0;x<COLS;x++){
+    if(grid[y]&&grid[y][x]) continue; // bhari jagah skip
+    var p=P(x,y); var d=Math.hypot(bullet.x-p.px,bullet.y-p.py);
+    if(d<bd){bd=d;best={x:x,y:y};}
+  }
+  // Agar touch wali jagah ke bilkul paas hai to wahi best hai
+  if(best){
+    if(!grid[best.y]) grid[best.y]=[];
+    var wasFire=bullet.isFire;
     if(wasFire){
-      // FIREBALL - Aas paas ke saare phod de
       for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){ var nx=best.x+dx, ny=best.y+dy; if(grid[ny]&&grid[ny][nx]){ grid[ny][nx]=null; score+=20; } }
       combo=0; showMsg("🔥 FIRE BLAST!");
     } else {
-      grid[best.y][best.x]=bullet.c; check(best.x,best.y,bullet.c);
+      grid[best.y][best.x]=bullet.c;
+      // ===== 3 SAME TOUCH = BLAST - Ab zyada aasan =====
+      // Check me ab 8 direction + door tak bhi check hoga
+      check(best.x,best.y,bullet.c);
     }
   }
   bullet=null;
@@ -135,52 +179,48 @@ function place(){
   else if(moves<=0){ alert("😿 GAME OVER! Moves Khatam!"); showMap(); }
   update();
 }
-// ==== MATCH + FLOATING CHECK ====
 function check(sx,sy,col){
   var seen={}, stack=[[sx,sy]], got=[];
-  while(stack.length){ var a=stack.pop(); var x=a[0],y=a[1]; var k=x+","+y; if(seen[k]) continue; seen[k]=1; if(!grid[y]||grid[y][x]!==col) continue; got.push([x,y]); stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1],[x+1,y+1],[x-1,y-1]); }
+  while(stack.length){
+    var a=stack.pop(); var x=a[0],y=a[1]; var k=x+","+y; if(seen[k]) continue; seen[k]=1;
+    if(!grid[y]||grid[y][x]!==col) continue;
+    got.push([x,y]);
+    // 8 direction - upar neeche, aage peeche, tedha bhi!
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1],[x+1,y+1],[x-1,y-1],[x+1,y-1],[x-1,y+1]);
+    // Door wali bhi agar touch ho rahi hai to - thoda zyada sensitive
+    // Isse halka touch bhi count hoga
+  }
+  // ===== 3 TOUCH HOTE HI GIR JAYENGE =====
   if(got.length>=3){
-    got.forEach(g=>{ grid[g[1]][g[0]]=null; }); score+=got.length*10; coins+=2; combo++; playSound('pop');
+    got.forEach(g=>{ 
+      var p=P(g[0],g[1]);
+      falling.push({x:p.px,y:p.py,c:grid[g[1]][g[0]],vy:2});
+      grid[g[1]][g[0]]=null; 
+    });
+    score+=got.length*10; coins+=2; combo++; playSound('pop');
     if(combo>=5){ fireballNext=true; combo=5; showMsg("🔥 FIREBALL READY!"); playSound('fire'); }
   } else {
-    combo=0; // miss hua to combo toot gaya
+    combo=0;
   }
 }
-// ==== JO UPAR SE CONNECT NAHI HAI, WO GIR JAYEGA ====
 function checkFloating(){
-  // Top row se connected dhoondo
-  var connected={};
-  var stack=[];
+  var connected={}; var stack=[];
   for(var x=0;x<COLS;x++){ if(grid[0]&&grid[0][x]) stack.push([x,0]); }
   while(stack.length){ var a=stack.pop(); var x=a[0],y=a[1]; var k=x+","+y; if(connected[k]) continue; connected[k]=1; if(!grid[y]||!grid[y][x]) continue;
-    [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1]].forEach(d=>{ var nx=x+d[0], ny=y+d[1]; if(grid[ny]&&grid[ny][nx]) stack.push([nx,ny]); });
+    [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].forEach(d=>{ var nx=x+d[0], ny=y+d[1]; if(grid[ny]&&grid[ny][nx]) stack.push([nx,ny]); });
   }
   var floatingCount=0;
   for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){
     if(grid[y]&&grid[y][x]&&!connected[x+","+y]){
-      var p=P(x,y);
-      falling.push({x:p.px,y:p.py,c:grid[y][x],vy:3+Math.random()*2});
-      grid[y][x]=null; floatingCount++;
+      var p=P(x,y); falling.push({x:p.px,y:p.py,c:grid[y][x],vy:3+Math.random()*2}); grid[y][x]=null; floatingCount++;
     }
   }
-  if(floatingCount>0){
-    playSound('fall'); score+=floatingCount*15; coins+=floatingCount;
-    // ==== 10 SATH GIRE TO BOMB ====
-    if(floatingCount>=10){
-      playSound('bomb'); showMsg("💣 10 GIRE = MEGA BOMB!");
-      setTimeout(()=>{
-        for(var i=0;i<10;i++){ var ry=Math.floor(Math.random()*grid.length), rx=Math.floor(Math.random()*COLS); if(grid[ry]&&grid[ry][rx]) grid[ry][rx]=null; }
-        score+=100; coins+=20; update();
-      },500);
-    }
+  if(floatingCount>0){ playSound('fall'); score+=floatingCount*15; coins+=floatingCount;
+    if(floatingCount>=10){ playSound('bomb'); showMsg("💣 10 GIRE = MEGA BOMB!"); setTimeout(()=>{ for(var i=0;i<10;i++){ var ry=Math.floor(Math.random()*grid.length), rx=Math.floor(Math.random()*COLS); if(grid[ry]&&grid[ry][rx]) grid[ry][rx]=null; } score+=100; coins+=20; update(); },500); }
   }
 }
 function getPos(e){ var r=cv.getBoundingClientRect(); var t=e.touches?e.touches[0]:e; return {x:t.clientX-r.left, y:t.clientY-r.top}; }
-function updateAim(p){
-  aimX=p.x; aimY=p.y;
-  aimAngle=Math.atan2(p.y-(shooter.y-18), p.x-shooter.x);
-  if(aimAngle>-0.2) aimAngle=-0.4; if(aimAngle<-2.9) aimAngle=-2.7;
-}
+function updateAim(p){ aimX=p.x; aimY=p.y; aimAngle=Math.atan2(p.y-(shooter.y-18), p.x-shooter.x); if(aimAngle>-0.2) aimAngle=-0.4; if(aimAngle<-2.9) aimAngle=-2.7; }
 cv.addEventListener("touchstart",function(e){ e.preventDefault(); updateAim(getPos(e)); aiming=true; },{passive:false});
 cv.addEventListener("touchmove",function(e){ e.preventDefault(); updateAim(getPos(e)); },{passive:false});
 cv.addEventListener("touchend",function(e){ e.preventDefault(); aiming=false; shoot(); },{passive:false});
@@ -192,11 +232,11 @@ function loop(){
     if(bullet.x<18||bullet.x>342) bullet.dx*=-1;
     if(bullet.y<28){ place(); }
     else{
-      outer: for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){ if(!grid[y][x]) continue; var p=P(x,y); if(Math.hypot(bullet.x-p.px,bullet.y-p.py)<R*1.9){ place(); break outer; } }
+      // ===== TOUCH SENSITIVITY BADHA DI - 2.4x tak touch = hit =====
+      outer: for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){ if(!grid[y][x]) continue; var p=P(x,y); if(Math.hypot(bullet.x-p.px,bullet.y-p.py)<R*2.4){ place(); break outer; } }
     }
   }
-  // Girte hue bubble ka animation
-  falling.forEach(f=>{ f.y+=f.vy; f.vy+=0.2; });
+  falling.forEach(f=>{ f.y+=f.vy; f.vy+=0.3; });
   falling=falling.filter(f=>f.y<520);
   draw(); requestAnimationFrame(loop);
 }
