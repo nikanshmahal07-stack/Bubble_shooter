@@ -7,70 +7,45 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#1A237E;font-family:Arial;text-align:center;overflow:hidden;touch-action:none;color:#fff}
-/* CLASSIC TOP BAR - Bilkul us game jaisa */
 .topbar{background:linear-gradient(#FF4081,#E91E63);padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
-.topbar .pill{background:#fff;color:#333;padding:6px 12px;border-radius:20px;font-weight:900;font-size:13px;display:flex;gap:5px;align-items:center}
+.topbar .pill{background:#fff;color:#333;padding:6px 12px;border-radius:20px;font-weight:900;font-size:13px}
 .logo-bar{background:#fff;padding:7px;display:flex;align-items:center;justify-content:center;gap:10px}
 .logo-bar .bubble{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,#FF4081,#C2185B);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #FFEB3B}
 .logo-bar h1{font-size:20px;color:#222;line-height:1;text-align:left}
 .logo-bar h1 span{color:#FF4081}
 .logo-bar h1 i{color:#2979FF;font-style:normal}
-.logo-bar p{font-size:10px;color:#999;font-weight:bold;letter-spacing:1px}
+.logo-bar p{font-size:10px;color:#999;font-weight:bold}
 #mapScreen{padding:10px}
 #map{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:360px;margin:12px auto}
-.lvl{width:56px;height:56px;border-radius:50%;border:3px solid #fff;font-weight:900;font-size:17px;box-shadow:0 4px 0 rgba(0,0,0,.3);cursor:pointer}
+.lvl{width:56px;height:56px;border-radius:50%;border:3px solid #fff;font-weight:900;font-size:17px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
 .lvl.open{background:linear-gradient(#00E676,#00C853);color:#fff}
 .lvl.cur{background:linear-gradient(#FFEB3B,#FFC107);color:#333;animation:bounce 1s infinite}
 .lvl.lock{background:#9E9E9E;color:#eee}
 @keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-canvas{background:linear-gradient(#4FC3F7,#81D4FA,#B3E5FC);border:3px solid #fff;border-radius:12px;margin-top:6px;touch-action:none;display:none;box-shadow:0 5px 20px rgba(0,0,0,.4)}
-.btns{display:none;justify-content:center;gap:10px;margin-top:8px}
-.btns button{padding:11px 16px;border:none;border-radius:25px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+canvas{background:linear-gradient(#4FC3F7,#81D4FA,#B3E5FC);border:3px solid #fff;border-radius:12px;margin-top:6px;touch-action:none;display:none}
+.btns{display:none;justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.btns button{padding:11px 14px;border:none;border-radius:25px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+#fireBtn{background:#FF3D00!important;color:#fff!important;display:none;animation:bounce 0.6s infinite}
 #back{margin-top:8px;background:#fff;padding:8px 22px;border-radius:20px;font-weight:900;border:none;display:none}
-#msg{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;color:#fff;text-shadow:3px 3px 0 #000;display:none;z-index:99}
-.progress{width:90%;height:10px;background:rgba(255,255,255,.3);border-radius:10px;margin:8px auto;overflow:hidden}
-.progress div{height:100%;background:#00E676;width:100%}
+#msg{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);font-size:30px;font-weight:900;color:#fff;text-shadow:3px 3px 0 #000;display:none;z-index:99}
+#fireBanner{background:#FF3D00;color:#fff;padding:6px;font-weight:900;display:none}
 </style>
 </head>
 <body>
 <div id="msg">💣 BOOM!</div>
-
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="pill">⭐ <span id="stars">0</span></div>
-  <div class="pill">🪙 <span id="coins">500</span></div>
-  <div class="pill" onclick="toggleSound()">🔊 <span id="sndBtn">ON</span></div>
-</div>
-
-<!-- LOGO -->
-<div class="logo-bar">
-  <div class="bubble">🫧</div>
-  <div><h1><span>BUBBLE SHOOTER</span><br><i>CLASSIC POP GAME</i></h1><p>CLASSIC • POP • FUN</p></div>
-  <div class="bubble" style="background:radial-gradient(circle at 30% 30%,#fff,#00E676,#00C853)">🐱</div>
-</div>
-
-<!-- LEVEL MAP - Classic Style -->
-<div id="mapScreen">
-  <h2 style="margin:8px;text-shadow:2px 2px 0 rgba(0,0,0,.3)">🗺️ CLASSIC MAP</h2>
-  <div class="progress"><div id="prog"></div></div>
-  <div id="map"></div>
-  <p style="font-size:12px;opacity:.9">Level 1 se kheliye! Jeetne par naya level khulega!</p>
-  <div style="display:flex;justify-content:center;gap:10px;margin-top:12px">
-    <div style="background:#fff;color:#333;padding:10px 15px;border-radius:12px;font-weight:900">🏆 BEST<br><span id="best">0</span></div>
-    <div style="background:#fff;color:#333;padding:10px 15px;border-radius:12px;font-weight:900">🎯 LEVEL<br><span id="curLv">1 / 50</span></div>
-  </div>
-</div>
-
+<div class="topbar"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🪙 <span id="coins">500</span></div><div class="pill" onclick="toggleSound()">🔊 <span id="sndBtn">ON</span></div></div>
+<div class="logo-bar"><div class="bubble">🫧</div><div><h1><span>BUBBLE SHOOTER</span><br><i>CLASSIC POP GAME</i></h1><p>CLASSIC • POP • FUN</p></div><div class="bubble" style="background:radial-gradient(circle at 30% 30%,#fff,#00E676,#00C853)">🐱</div></div>
+<div id="fireBanner">🔥 FIREBALL READY! - FIRE BUTTON DABAO! 🔥</div>
+<div id="mapScreen"><h2 style="margin:8px">🗺️ CLASSIC MAP</h2><div id="map"></div><p style="font-size:12px">🔥 3 Combo = Fireball | 💣 Bomb Button = Pakka Chalega</p></div>
 <canvas id="c" width="360" height="520"></canvas>
 <div class="btns" id="btns">
-  <button style="background:#FF5252;color:#fff" onclick="useBomb()">💣 BOMB</button>
+  <button style="background:#FF5252;color:#fff" onclick="useBomb()">💣 BOMB (FREE)</button>
+  <button id="fireBtn" onclick="activateFireball()">🔥 FIREBALL</button>
   <button style="background:#448AFF;color:#fff" onclick="changeColor()">🎨 CHANGE</button>
   <button style="background:#FFEB3B" onclick="showMap()">🗺️ MAP</button>
 </div>
 <button id="back" onclick="showMap()">⬅ BACK</button>
-
 <script>
-// SOUND
 var soundOn=true, audioCtx=null;
 function playSound(t){
   if(!soundOn) return;
@@ -80,47 +55,60 @@ function playSound(t){
     if(t=='shoot'){ o.frequency.value=500; o.type='sine'; g.gain.value=0.12; o.start(); o.frequency.exponentialRampToValueAtTime(900,audioCtx.currentTime+0.08); o.stop(audioCtx.currentTime+0.09); }
     if(t=='pop'){ o.frequency.value=850; o.type='square'; g.gain.value=0.1; o.start(); o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.12); o.stop(audioCtx.currentTime+0.14); }
     if(t=='fall'){ o.frequency.value=600; o.type='triangle'; g.gain.value=0.1; o.start(); o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.25); }
-    if(t=='bomb'){ o.frequency.value=150; o.type='sawtooth'; g.gain.value=0.2; o.start(); o.frequency.exponentialRampToValueAtTime(40,audioCtx.currentTime+0.3); o.stop(audioCtx.currentTime+0.35); }
+    if(t=='bomb'){ o.frequency.value=150; o.type='sawtooth'; g.gain.value=0.25; o.start(); o.frequency.exponentialRampToValueAtTime(40,audioCtx.currentTime+0.35); o.stop(audioCtx.currentTime+0.4); }
     if(t=='fire'){ o.frequency.value=1000; o.type='sawtooth'; g.gain.value=0.12; o.start(); o.frequency.exponentialRampToValueAtTime(2000,audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.25); }
     if(t=='win'){ [523,659,784,1046].forEach((f,i)=>{ var o2=audioCtx.createOscillator(), g2=audioCtx.createGain(); o2.connect(g2); g2.connect(audioCtx.destination); o2.frequency.value=f; o2.start(audioCtx.currentTime+i*0.12); o2.stop(audioCtx.currentTime+i*0.12+0.15); }); }
   }catch(e){}
 }
 function toggleSound(){ soundOn=!soundOn; document.getElementById("sndBtn").innerText=soundOn?"ON":"OFF"; }
-function showMsg(txt){ var m=document.getElementById("msg"); m.innerText=txt; m.style.display="block"; setTimeout(()=>m.style.display="none",900); }
+function showMsg(txt){ var m=document.getElementById("msg"); m.innerText=txt; m.style.display="block"; setTimeout(()=>m.style.display="none",1200); }
 
 var cv=document.getElementById("c"), ctx=cv.getContext("2d");
-// CLASSIC COLORS - Bilkul us game wale
 var COL=["#F44336","#2196F3","#4CAF50","#FFEB3B","#9C27B0","#00BCD4"];
-var R=17, COLS=9, grid=[], score=0, level=1, moves=30, coins=500, stars=0, unlocked=1, combo=0, fireballNext=false, best=0;
+var R=17, COLS=9, grid=[], score=0, level=1, moves=30, coins=500, stars=0, unlocked=1, combo=0, fireballReady=false, fireballActive=false, best=0, bombCount=2;
 var shooter={x:180,y:455,c:COL[0],n:COL[1]};
 var bullet=null, aiming=false, falling=[];
 var aimAngle=-Math.PI/2; var BULLET_SPEED=14;
 
-function buildMap(){
-  var m=document.getElementById("map"); m.innerHTML="";
-  for(var i=1;i<=50;i++){
-    var b=document.createElement("button"); b.className="lvl "+(i<unlocked?"open": i==unlocked?"cur":"lock");
-    b.innerText=i<=unlocked?i:"🔒";
-    if(i<=unlocked){ (function(l){ b.onclick=function(){ startLevel(l); }; })(i); }
-    m.appendChild(b);
-  }
-  document.getElementById("prog").style.width=(unlocked/50*100)+"%";
-  document.getElementById("curLv").innerText=unlocked+" / 50";
-  document.getElementById("best").innerText=best;
-}
-function showMap(){ document.getElementById("mapScreen").style.display="block"; cv.style.display="none"; document.getElementById("btns").style.display="none"; document.getElementById("back").style.display="none"; buildMap(); }
+function buildMap(){ var m=document.getElementById("map"); m.innerHTML=""; for(var i=1;i<=50;i++){ var b=document.createElement("button"); b.className="lvl "+(i<unlocked?"open": i==unlocked?"cur":"lock"); b.innerText=i<=unlocked?i:"🔒"; if(i<=unlocked){ (function(l){ b.onclick=function(){ startLevel(l); }; })(i); } m.appendChild(b); } }
+function showMap(){ document.getElementById("mapScreen").style.display="block"; cv.style.display="none"; document.getElementById("btns").style.display="none"; document.getElementById("back").style.display="none"; document.getElementById("fireBanner").style.display="none"; buildMap(); }
 function startLevel(l){ level=l; document.getElementById("mapScreen").style.display="none"; cv.style.display="block"; document.getElementById("btns").style.display="flex"; document.getElementById("back").style.display="inline-block"; newGame(); }
 function newGame(){
-  grid=[]; moves=25+level*2; if(moves>40) moves=40; combo=0; fireballNext=false; falling=[];
+  grid=[]; moves=25+level*2; if(moves>40) moves=40; combo=0; fireballReady=false; fireballActive=false; falling=[]; bombCount=2;
   var cc = level<3?3: level<10?4: level<25?5:6;
   var rows = level<5?5: level<15?6:7;
   for(var y=0;y<rows;y++){ grid[y]=[]; for(var x=0;x<COLS;x++){ grid[y][x]= Math.random()<0.94 ? COL[Math.floor(Math.random()*cc)] : null; } }
-  update();
+  shooter.c=getSmartColor(); shooter.n=getSmartColor();
+  update(); updateFireUI();
 }
 function update(){ document.getElementById("coins").innerText=coins; document.getElementById("stars").innerText=stars; if(score>best) best=score; }
+function updateFireUI(){
+  document.getElementById("fireBtn").style.display = fireballReady ? "inline-block" : "none";
+  document.getElementById("fireBanner").style.display = fireballReady ? "block" : "none";
+}
+// ===== SMART COLOR - Last me wahi colour ayega jo upar bacha hai =====
+function getSmartColor(){
+  var present=[];
+  grid.forEach(r=>r.forEach(c=>{ if(c && present.indexOf(c)==-1) present.push(c); }));
+  if(present.length==0) return COL[Math.floor(Math.random()*COL.length)];
+  // Agar last me kam bubble bache hai, to unhi me se do - Level kabhi atkega nahi
+  var left=0; grid.forEach(r=>r.forEach(c=>{ if(c) left++; }));
+  if(left<=8){
+    // Jo colour sabse zyada hai wahi do
+    var counts={}; present.forEach(c=>counts[c]=0);
+    grid.forEach(r=>r.forEach(c=>{ if(c) counts[c]++; }));
+    present.sort((a,b)=>counts[b]-counts[a]);
+    return present[0];
+  }
+  return present[Math.floor(Math.random()*present.length)];
+}
+function activateFireball(){
+  if(!fireballReady) return;
+  fireballActive=true; fireballReady=false; updateFireUI();
+  showMsg("🔥 FIREBALL ACTIVE! AB MARO!"); playSound('fire');
+}
 function P(x,y){ var off=(y%2)*R; return {px:22+off+x*(R*2+3), py:30+y*(R*2-3)}; }
 function drawB(x,y,c,isFire){
-  // Classic Shiny Bubble - Bilkul us game jaisa
   ctx.beginPath(); ctx.arc(x,y,R,0,7);
   var gr=ctx.createRadialGradient(x-6,y-7,2,x,y,R); gr.addColorStop(0,"rgba(255,255,255,.9)"); gr.addColorStop(0.3,c); gr.addColorStop(1,c);
   ctx.fillStyle=gr; ctx.fill();
@@ -149,48 +137,64 @@ function getArrowPath(){
 function draw(){
   if(cv.style.display=="none") return;
   ctx.clearRect(0,0,360,520);
-  // Classic Background
-  ctx.fillStyle="#333"; ctx.font="bold 12px Arial"; ctx.fillText("LEVEL "+level+"   •   SCORE "+score+"   •   MOVES "+moves+"   •   COMBO "+combo, 25, 18);
-  // Bounce Arrow - Bilkul us game jaisa, deewar se takra ke bubble tak
+  ctx.fillStyle="#333"; ctx.font="bold 12px Arial"; ctx.fillText("LEVEL "+level+"   •   SCORE "+score+"   •   MOVES "+moves+"   •   COMBO "+combo+"/3", 15, 18);
+  if(fireballActive) { ctx.fillStyle="#FF3D00"; ctx.fillText("🔥 FIREBALL READY - NEXT SHOT FIRE HOGA!", 70, 38); }
+  else if(fireballReady) { ctx.fillStyle="#FF3D00"; ctx.fillText("🔥 FIREBALL BUTTON DABAO!", 90, 38); }
   var path=getArrowPath();
   ctx.save();
-  ctx.setLineDash([8,7]); ctx.strokeStyle= fireballNext?"#FF3D00":"#fff"; ctx.lineWidth=3;
+  ctx.setLineDash([8,7]); ctx.strokeStyle= fireballActive?"#FF3D00":"#fff"; ctx.lineWidth=3;
   ctx.beginPath(); ctx.moveTo(path[0].x,path[0].y);
   for(var i=1;i<path.length;i++) ctx.lineTo(path[i].x,path[i].y);
   ctx.stroke(); ctx.setLineDash([]);
   var last=path[path.length-1]; var prev=path[path.length-2]||path[0];
   var ang=Math.atan2(last.y-prev.y,last.x-prev.x);
   ctx.translate(last.x,last.y); ctx.rotate(ang);
-  ctx.fillStyle= fireballNext?"#FF3D00":"#fff"; ctx.strokeStyle="#333"; ctx.lineWidth=1.5;
+  ctx.fillStyle= fireballActive?"#FF3D00":"#fff"; ctx.strokeStyle="#333"; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(16,0); ctx.lineTo(2,-9); ctx.lineTo(2,9); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.arc(0,0,7,0,7); ctx.fillStyle= fireballNext?"#FF3D00":shooter.c; ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0,0,7,0,7); ctx.fillStyle= fireballActive?"#FF3D00":shooter.c; ctx.fill(); ctx.stroke();
   ctx.restore();
   path.forEach((pt,idx)=>{ if(idx>0&&idx<path.length-1){ ctx.beginPath(); ctx.arc(pt.x,pt.y,4,0,7); ctx.fillStyle="#FFEB3B"; ctx.fill(); ctx.strokeStyle="#333"; ctx.stroke(); } });
-  // Grid
   for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){ if(!grid[y][x]) continue; var p=P(x,y); drawB(p.px,p.py,grid[y][x],false); }
   falling.forEach(f=>{ drawB(f.x,f.y,f.c,false); });
-  // Classic Shooter - Cat + Cannon
   ctx.font="48px Arial"; ctx.fillText("🐱",152,515);
   ctx.font="bold 10px Arial"; ctx.fillStyle="#333"; ctx.fillText("NEXT",303,500);
-  if(fireballNext){ drawB(shooter.x,shooter.y-18,"#FF3D00",true); } else { drawB(shooter.x,shooter.y-18,shooter.c,false); }
+  if(fireballActive){ drawB(shooter.x,shooter.y-18,"#FF3D00",true); } else { drawB(shooter.x,shooter.y-18,shooter.c,false); }
   drawB(318,475,shooter.n,false);
   if(bullet) drawB(bullet.x,bullet.y,bullet.c,bullet.isFire);
 }
-function useBomb(){ if(coins<20){ alert("20 Coin chahiye!"); return; } coins-=20; playSound('bomb'); showMsg("💣 BOOM!"); for(var y=0;y<3;y++) for(var x=3;x<6;x++){ if(grid[y]&&grid[y][x]) grid[y][x]=null; } score+=50; update(); checkFloating(); }
-function changeColor(){ if(coins<10){ alert("10 Coin chahiye!"); return; } coins-=10; shooter.c=COL[Math.floor(Math.random()*COL.length)]; update(); }
+// ===== BOMB - AB PAKKA CHALEGA, FREE + BECH KE 3x3 UDAYEGA =====
+function useBomb(){
+  playSound('bomb'); showMsg("💣 BOOM! 💣");
+  // Screen hilao jaisa feel
+  var hitCount=0;
+  for(var y=0;y<4;y++) for(var x=2;x<7;x++){ if(grid[y]&&grid[y][x]){ grid[y][x]=null; hitCount++; } }
+  // Agar upar kam hai to beech se bhi udao
+  if(hitCount<5){ for(var y=2;y<6;y++) for(var x=0;x<COLS;x++){ if(grid[y]&&grid[y][x]&&Math.random()<0.5){ grid[y][x]=null; hitCount++; } } }
+  score+=hitCount*20; coins+=10;
+  update(); checkFloating();
+  setTimeout(()=>{ checkFloating(); },300);
+}
+function changeColor(){
+  // Smart change - upar wale colour me se hi do
+  shooter.c=getSmartColor(); update();
+}
 function shoot(){
   if(bullet||moves<=0) return;
-  var ang=aimAngle; var isFire=fireballNext;
-  if(isFire){ playSound('fire'); showMsg("🔥 FIREBALL!"); fireballNext=false; } else playSound('shoot');
+  var ang=aimAngle; var isFire=fireballActive;
+  if(isFire){ playSound('fire'); showMsg("🔥 FIREBALL!"); fireballActive=false; updateFireUI(); } else playSound('shoot');
   bullet={x:shooter.x,y:shooter.y-18,c: isFire?"#FF3D00":shooter.c,dx:Math.cos(ang)*BULLET_SPEED,dy:Math.sin(ang)*BULLET_SPEED, isFire:isFire};
-  shooter.c=shooter.n; shooter.n=COL[Math.floor(Math.random()*COL.length)]; moves--;
+  shooter.c=shooter.n; shooter.n=getSmartColor(); // NEXT bhi smart
+  moves--;
 }
 function place(){
   var best=null, bd=99999;
   for(var y=0;y<12;y++) for(var x=0;x<COLS;x++){ if(grid[y]&&grid[y][x]) continue; var p=P(x,y); var d=Math.hypot(bullet.x-p.px,bullet.y-p.py); if(d<bd){bd=d;best={x:x,y:y};} }
   if(best){ if(!grid[best.y]) grid[best.y]=[]; var wasFire=bullet.isFire;
-    if(wasFire){ for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){ var nx=best.x+dx, ny=best.y+dy; if(grid[ny]&&grid[ny][nx]){ grid[ny][nx]=null; score+=20; } } combo=0; showMsg("🔥 FIRE BLAST!"); }
-    else { grid[best.y][best.x]=bullet.c; check(best.x,best.y,bullet.c); }
+    if(wasFire){
+      // Fireball - 3x3 bada blast
+      for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){ var nx=best.x+dx, ny=best.y+dy; if(grid[ny]&&grid[ny][nx]){ grid[ny][nx]=null; score+=20; } }
+      combo=0; showMsg("🔥 FIRE BLAST!"); playSound('bomb');
+    } else { grid[best.y][best.x]=bullet.c; check(best.x,best.y,bullet.c); }
   }
   bullet=null; checkFloating();
   var left=0; grid.forEach(r=>r.forEach(c=>{if(c)left++}));
@@ -201,7 +205,15 @@ function place(){
 function check(sx,sy,col){
   var seen={}, stack=[[sx,sy]], got=[];
   while(stack.length){ var a=stack.pop(); var x=a[0],y=a[1]; var k=x+","+y; if(seen[k]) continue; seen[k]=1; if(!grid[y]||grid[y][x]!==col) continue; got.push([x,y]); stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1],[x+1,y+1],[x-1,y-1],[x+1,y-1],[x-1,y+1]); }
-  if(got.length>=3){ got.forEach(g=>{ var p=P(g[0],g[1]); falling.push({x:p.px,y:p.py,c:grid[g[1]][g[0]],vy:3}); grid[g[1]][g[0]]=null; }); score+=got.length*10; coins+=2; combo++; playSound('pop'); if(combo>=5){ fireballNext=true; combo=5; showMsg("🔥 FIREBALL READY!"); playSound('fire'); } } else { combo=0; }
+  if(got.length>=3){
+    got.forEach(g=>{ var p=P(g[0],g[1]); falling.push({x:p.px,y:p.py,c:grid[g[1]][g[0]],vy:3}); grid[g[1]][g[0]]=null; });
+    score+=got.length*10; coins+=2; combo++; playSound('pop');
+    // ===== AB 3 COMBO PE HI FIREBALL - Pehle 5 tha, isliye aata nahi tha! =====
+    if(combo>=3 && !fireballReady && !fireballActive){ fireballReady=true; updateFireUI(); showMsg("🔥 FIREBALL READY!"); playSound('fire'); }
+  } else {
+    // Miss pe combo poora khatam mat karo, sirf 1 kam karo - taaki fireball aasani se aaye
+    if(combo>0) combo--;
+  }
 }
 function checkFloating(){
   var connected={}; var stack=[];
