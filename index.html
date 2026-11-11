@@ -3,89 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>BUBBLE SHOOTER</title>
+<title>Bubble Shooter</title>
 <style>
-body{margin:0;background:#150033;color:#fff;font-family:Arial;text-align:center;touch-action:none;overflow:hidden}
-h2{background:#FFEB3B;color:#000;margin:0;padding:10px;font-size:20px}
-#top{display:flex;justify-content:space-around;background:#2a0a5e;padding:8px;font-weight:bold}
-canvas{background:#1e0b4a;border:3px solid #FFEB3B;border-radius:12px;margin-top:8px;touch-action:none}
-button{margin-top:8px;padding:10px 22px;background:#00E676;border:none;border-radius:20px;font-weight:bold;font-size:15px}
-p{font-size:13px;opacity:.8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#FFD93D;background:linear-gradient(#FFD93D,#FF6B6B);font-family:Arial;text-align:center;overflow:hidden;touch-action:none}
+.logo{background:#fff;padding:8px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.logo-icon{width:45px;height:45px;background:linear-gradient(#FF4081,#7C4DFF);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid #FFEB3B;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.logo h1{font-size:20px;line-height:1;text-align:left;color:#333}
+.logo h1 span{color:#FF3D00;font-size:22px}
+.logo p{font-size:10px;color:#888}
+.top{display:flex;justify-content:space-between;padding:8px 12px;font-weight:900;font-size:13px}
+.top span{background:#fff;padding:5px 12px;border-radius:20px}
+canvas{background:linear-gradient(#7EC8FF,#E0F7FF);border:3px solid #fff;border-radius:15px;margin-top:2px;touch-action:none;display:none}
+#map{padding:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:360px;margin:10px auto}
+.lvl{width:55px;height:55px;border-radius:50%;border:3px solid #fff;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.lvl.open{background:#00E676}
+.lvl.lock{background:#ccc;color:#666}
+.lvl.cur{background:#FFEB3B;animation:bounce 1s infinite}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.btns{display:none;justify-content:center;gap:8px;margin-top:5px}
+button{padding:10px 16px;border:none;border-radius:25px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+#back{margin-top:10px;background:#fff;padding:8px 20px;border-radius:20px;font-weight:900;border:none}
 </style>
 </head>
 <body>
-<h2>🎯 BUBBLE SHOOTER 🎯</h2>
-<div id="top"><span id="s">SCORE: 0</span><span id="l">LEVEL: 1</span></div>
-<canvas id="c" width="360" height="520"></canvas>
-<br><button onclick="location.reload()">🔄 RESTART</button>
-<p>👆 Upar wale Bubble pe Touch karo, Bubble apne aap chalega!</p>
+
+<!-- LOGO -->
+<div class="logo">
+  <div class="logo-icon">🫧</div>
+  <div><h1><span>BUBBLE</span> SHOOTER</h1><p>⭐ DESI WALA GAME - 50 LEVELS ⭐</p></div>
+  <div class="logo-icon" style="background:linear-gradient(#00E676,#2979FF)">🐱</div>
+</div>
+
+<div class="top"><span>⭐ <b id="stars">0</b></span><span>🪙 <b id="coins">100</b></span><span>🔊 <b id="sndBtn" onclick="toggleSound()" style="cursor:pointer">ON</b></span></div>
+
+<!-- LEVEL MAP -->
+<div id="mapScreen">
+  <h2 style="color:#fff;text-shadow:2px 2px 0 #000;margin:8px">🗺️ LEVEL CHUNO 🗺️</h2>
+  <div id="map"></div>
+  <p style="color:#fff;font-weight:bold;font-size:12px">Level 1 se shuru karo! Jeetoge to agla khulega!</p>
+</div>
+
+<!-- GAME -->
+<canvas id="c" width="360" height="500"></canvas>
+<div class="btns" id="btns">
+  <button style="background:#FF5252;color:#fff" onclick="useBomb()">💣 BOMB (20🪙)</button>
+  <button style="background:#448AFF;color:#fff" onclick="changeColor()">🎨 COLOUR (10🪙)</button>
+  <button style="background:#00E676" onclick="showMap()">🗺️ MAP</button>
+</div>
+<button id="back" onclick="showMap()" style="display:none">⬅ BACK TO MAP</button>
+
 <script>
+// ===== SOUND - Bina Internet Ke =====
+var soundOn=true, audioCtx=null;
+function playSound(type){
+  if(!soundOn) return;
+  try{
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if(type=='shoot'){ o.frequency.value=500; o.type='sine'; g.gain.value=0.15; o.start(); o.frequency.exponentialRampToValueAtTime(900,audioCtx.currentTime+0.1); o.stop(audioCtx.currentTime+0.12); }
+    if(type=='pop'){ o.frequency.value=800; o.type='square'; g.gain.value=0.12; o.start(); o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.15); o.stop(audioCtx.currentTime+0.18); }
+    if(type=='win'){ [523,659,784,1046].forEach((f,i)=>{ var o2=audioCtx.createOscillator(), g2=audioCtx.createGain(); o2.connect(g2); g2.connect(audioCtx.destination); o2.frequency.value=f; o2.start(audioCtx.currentTime+i*0.15); o2.stop(audioCtx.currentTime+i*0.15+0.2); }); }
+    if(type=='lose'){ o.frequency.value=300; o.type='sawtooth'; g.gain.value=0.15; o.start(); o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.4); o.stop(audioCtx.currentTime+0.45); }
+  }catch(e){}
+}
+function toggleSound(){ soundOn=!soundOn; document.getElementById("sndBtn").innerText=soundOn?"ON":"OFF"; }
+
+// ===== GAME =====
 var cv=document.getElementById("c"), ctx=cv.getContext("2d");
-var COL=["#FF3D00","#2979FF","#00E676","#FFEA00","#FF4081","#00E5FF"];
-var R=17, COLS=9, grid=[], score=0, level=1;
-var shooter={x:180,y:485,c:COL[0],n:COL[1]};
+var COL=["#FF3D00","#2979FF","#00C853","#FFEA00","#D500F9","#00BCD4"];
+var R=17, COLS=9, grid=[], score=0, level=1, moves=30, coins=100, stars=0, unlocked=1;
+var shooter={x:180,y:435,c:COL[0],n:COL[1]};
 var bullet=null, aimX=180, aimY=100, aiming=false;
 
+function buildMap(){
+  var m=document.getElementById("map"); m.innerHTML="";
+  for(var i=1;i<=50;i++){
+    var b=document.createElement("button"); b.className="lvl "+(i<unlocked?"open": i==unlocked?"cur":"lock");
+    b.innerText=i<=unlocked?i:"🔒";
+    if(i<=unlocked){ (function(l){ b.onclick=function(){ startLevel(l); }; })(i); }
+    m.appendChild(b);
+  }
+}
+function showMap(){
+  document.getElementById("mapScreen").style.display="block";
+  cv.style.display="none"; document.getElementById("btns").style.display="none"; document.getElementById("back").style.display="none";
+  buildMap();
+}
+function startLevel(l){
+  level=l; playSound('shoot');
+  document.getElementById("mapScreen").style.display="none";
+  cv.style.display="block"; document.getElementById("btns").style.display="flex"; document.getElementById("back").style.display="inline-block";
+  newGame();
+}
 function newGame(){
-  grid=[];
-  for(var y=0;y<5;y++){ grid[y]=[]; for(var x=0;x<COLS;x++){ grid[y][x]= Math.random()<0.95 ? COL[Math.floor(Math.random()*4)] : null; } }
+  grid=[]; moves=25+level*2; if(moves>40) moves=40;
+  var cc = level<3?3: level<10?4: level<25?5:6;
+  var rows = level<5?5: level<15?6:7;
+  for(var y=0;y<rows;y++){ grid[y]=[]; for(var x=0;x<COLS;x++){ grid[y][x]= Math.random()<0.94 ? COL[Math.floor(Math.random()*cc)] : null; } }
+  update();
+}
+function update(){
+  document.getElementById("coins").innerText=coins;
+  document.getElementById("stars").innerText=stars;
 }
 function P(x,y){ var off=(y%2)*R; return {px:22+off+x*(R*2+3), py:28+y*(R*2-3)}; }
 function drawB(x,y,c){
   ctx.beginPath(); ctx.arc(x,y,R,0,7); ctx.fillStyle=c; ctx.fill();
-  ctx.lineWidth=2; ctx.strokeStyle="#fff"; ctx.stroke();
-  ctx.beginPath(); ctx.arc(x-5,y-6,4,0,7); ctx.fillStyle="rgba(255,255,255,.6)"; ctx.fill();
+  ctx.lineWidth=2.5; ctx.strokeStyle="#fff"; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x-5,y-6,5,0,7); ctx.fillStyle="rgba(255,255,255,.7)"; ctx.fill();
 }
 function draw(){
-  ctx.clearRect(0,0,360,520);
-  // AIM LINE
+  if(cv.style.display=="none") return;
+  ctx.clearRect(0,0,360,500);
+  ctx.font="18px Arial"; ctx.fillText("☁️",20,20); ctx.fillText("☁️",300,15);
+  ctx.fillStyle="#333"; ctx.font="bold 13px Arial"; ctx.fillText("LEVEL "+level+"  |  Moves: "+moves+"  |  Score: "+score, 70, 20);
   if(aiming){
-    ctx.setLineDash([6,6]); ctx.strokeStyle="rgba(255,255,255,.6)"; ctx.lineWidth=2;
+    ctx.setLineDash([6,6]); ctx.strokeStyle="rgba(255,255,255,.9)"; ctx.lineWidth=2;
     ctx.beginPath(); ctx.moveTo(shooter.x,shooter.y); ctx.lineTo(aimX,aimY); ctx.stroke(); ctx.setLineDash([]);
   }
   for(var y=0;y<grid.length;y++) for(var x=0;x<COLS;x++){ if(!grid[y][x]) continue; var p=P(x,y); drawB(p.px,p.py,grid[y][x]); }
-  drawB(shooter.x,shooter.y,shooter.c);
-  drawB(315,485,shooter.n);
-  ctx.fillStyle="#fff"; ctx.font="bold 10px Arial"; ctx.fillText("NEXT",303,512);
+  ctx.font="48px Arial"; ctx.fillText("🐱",152,495);
+  drawB(shooter.x,shooter.y-18,shooter.c);
+  drawB(315,460,shooter.n);
+  ctx.fillStyle="#333"; ctx.font="bold 10px Arial"; ctx.fillText("NEXT",303,485);
   if(bullet) drawB(bullet.x,bullet.y,bullet.c);
 }
+function useBomb(){
+  if(coins<20){ alert("20 Coin chahiye!"); return; }
+  coins-=20; playSound('pop');
+  for(var y=0;y<3;y++) for(var x=3;x<6;x++){ if(grid[y]&&grid[y][x]) grid[y][x]=null; }
+  score+=50; update();
+}
+function changeColor(){
+  if(coins<10){ alert("10 Coin chahiye!"); return; }
+  coins-=10; shooter.c=COL[Math.floor(Math.random()*COL.length)]; update();
+}
 function shoot(){
-  if(bullet) return;
-  var ang=Math.atan2(aimY-shooter.y, aimX-shooter.x);
-  // upar ki taraf hi jaye
+  if(bullet||moves<=0) return;
+  var ang=Math.atan2(aimY-(shooter.y-18), aimX-shooter.x);
   if(ang>-0.2) ang=-0.4; if(ang<-2.9) ang=-2.7;
-  bullet={x:shooter.x,y:shooter.y,c:shooter.c,dx:Math.cos(ang)*7,dy:Math.sin(ang)*7};
+  bullet={x:shooter.x,y:shooter.y-18,c:shooter.c,dx:Math.cos(ang)*7,dy:Math.sin(ang)*7};
   shooter.c=shooter.n; shooter.n=COL[Math.floor(Math.random()*COL.length)];
+  moves--; playSound('shoot');
 }
 function place(){
   var best=null, bd=99999;
   for(var y=0;y<12;y++) for(var x=0;x<COLS;x++){ var p=P(x,y); var d=Math.hypot(bullet.x-p.px,bullet.y-p.py); if(d<bd){bd=d;best={x:x,y:y};} }
   if(best){ if(!grid[best.y]) grid[best.y]=[]; grid[best.y][best.x]=bullet.c; check(best.x,best.y,bullet.c); }
   bullet=null;
-  document.getElementById("s").innerText="SCORE: "+score;
   var left=0; grid.forEach(r=>r.forEach(c=>{if(c)left++}));
-  if(left==0){ level++; document.getElementById("l").innerText="LEVEL: "+level; alert("Level Clear! Ab Level "+level); newGame(); }
+  if(left==0){
+    var s = moves>15?3: moves>5?2:1;
+    stars+=s; coins+=30; playSound('win');
+    if(level==unlocked && unlocked<50) unlocked++;
+    alert("🎉 LEVEL "+level+" CLEAR! ⭐ "+s+" Star! +30 Coin! Agla Level Khul Gaya!");
+    showMap();
+  } else if(moves<=0){
+    playSound('lose'); alert("😿 GAME OVER! Moves Khatam! Dobara Try Karo!");
+    showMap();
+  }
+  update();
 }
 function check(sx,sy,col){
   var seen={}, stack=[[sx,sy]], got=[];
   while(stack.length){ var a=stack.pop(); var x=a[0],y=a[1]; var k=x+","+y; if(seen[k]) continue; seen[k]=1; if(!grid[y]||grid[y][x]!==col) continue; got.push([x,y]);
     stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1],[x+1,y+1],[x-1,y-1]);
   }
-  if(got.length>=3){ got.forEach(function(g){ grid[g[1]][g[0]]=null; }); score+=got.length*10; }
+  if(got.length>=3){ got.forEach(function(g){ grid[g[1]][g[0]]=null; }); score+=got.length*10; coins+=2; playSound('pop'); }
 }
-function getPos(e){
-  var r=cv.getBoundingClientRect();
-  var t=e.touches?e.touches[0]:e;
-  return {x:t.clientX-r.left, y:t.clientY-r.top};
-}
-// TOUCH - dabao, ghumao, chhodo = shoot
+function getPos(e){ var r=cv.getBoundingClientRect(); var t=e.touches?e.touches[0]:e; return {x:t.clientX-r.left, y:t.clientY-r.top}; }
 cv.addEventListener("touchstart",function(e){ e.preventDefault(); var p=getPos(e); aimX=p.x; aimY=p.y; aiming=true; },{passive:false});
 cv.addEventListener("touchmove",function(e){ e.preventDefault(); var p=getPos(e); aimX=p.x; aimY=p.y; },{passive:false});
 cv.addEventListener("touchend",function(e){ e.preventDefault(); aiming=false; shoot(); },{passive:false});
-// MOUSE ke liye bhi
-cv.addEventListener("mousemove",function(e){ var p=getPos(e); aimX=p.x; aimY=p.y; aiming=true; });
 cv.addEventListener("click",function(e){ var p=getPos(e); aimX=p.x; aimY=p.y; shoot(); });
-
 function loop(){
   if(bullet){
     bullet.x+=bullet.dx; bullet.y+=bullet.dy;
@@ -97,7 +189,7 @@ function loop(){
   }
   draw(); requestAnimationFrame(loop);
 }
-newGame(); loop();
+buildMap(); loop();
 </script>
 </body>
 </html>
