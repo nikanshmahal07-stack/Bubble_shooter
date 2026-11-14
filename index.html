@@ -1,185 +1,79 @@
 <!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Bubble Pop Master - Video Wala</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>3D Bubble Pop Master</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial;background:#a9c6ff;text-align:center;overflow:hidden}
-.screen{display:none;min-height:100vh}
-.screen.active{display:block}
-#load{background:linear-gradient(#8db4ff,#c9dcff);padding-top:80px}
-#load h1{font-size:42px;color:#e60000;text-shadow:2px 2px 0 #fff;line-height:0.9}
-#load h1 span{font-size:22px;color:#00a2e8;letter-spacing:3px}
-.loader{width:90px;height:90px;border:10px dotted #4a4ae0;border-radius:50%;margin:40px auto;animation:spin 1.5s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#load p{font-size:20px;color:#fff;font-weight:bold}
-.bar{width:80%;height:28px;background:#6a5acd;border-radius:20px;margin:25px auto;overflow:hidden;border:3px solid #fff}
-#fill{height:100%;width:0%;background:#a855f7;border-radius:20px;transition:width .3s}
-.tip{background:rgba(255,255,255,.7);margin:20px;padding:12px;font-weight:bold}
-/* MAP */
-#map{background:#b9a5ff;padding:10px}
-.map-top{background:#fff;border-radius:15px;padding:10px;display:flex;justify-content:space-between;align-items:center}
-.coins{background:#ffd700;padding:6px 12px;border-radius:20px;font-weight:bold}
-.path{position:relative;height:480px;margin-top:10px}
-.lvl{position:absolute;width:52px;height:52px;border-radius:50%;background:#9d4edd;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid #fff;box-shadow:0 4px 0 #5a1a9e}
-.lvl.done{background:#7c3aed}
-.lvl.now{background:#22c55e;width:64px;height:64px;font-size:18px;border-color:#ffe600}
-.playBtn{background:#22c55e;color:#fff;border:0;padding:16px 40px;border-radius:12px;font-size:22px;font-weight:bold;margin-top:10px;box-shadow:0 5px 0 #15803d}
-/* GAME */
-#game{background:linear-gradient(#cfe0ff,#a9c6ff)}
-.game-top{background:#1e2a5a;color:#fff;padding:8px;display:flex;justify-content:space-between}
-#prog{flex:1;height:14px;background:#fff;border-radius:10px;margin:0 10px;overflow:hidden}
-#progFill{height:100%;width:0%;background:#ffd700}
-canvas{display:block;margin:auto;background:transparent;touch-action:none}
-.controls{display:flex;justify-content:center;gap:8px;padding:8px}
-.cbtn{background:#fff;border:2px solid #1e2a5a;border-radius:12px;padding:10px;font-size:14px;font-weight:bold}
-.cbtn b{color:red}
-#popMsg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20}
-#popMsg div{background:#fff;padding:22px;border-radius:18px;width:85%;max-width:340px}
-#popMsg h2{color:#a21caf;font-size:26px}
-button{padding:13px 25px;border:0;border-radius:30px;background:#22c55e;color:#fff;font-size:18px;font-weight:bold;margin-top:10px}
-</style>
-</head>
-<body>
-
-<!-- 1. LOADING -->
-<div id="load" class="screen active">
-<h1>💚 Bubble<br><span>POP MASTER</span></h1>
-<div class="loader"></div>
-<p>Getting things ready for you...</p>
-<div class="bar"><div id="fill"></div></div>
-<div class="tip">TIP: USE THE WALLS TO BOUNCE<br>OFF BUBBLES FOR BETTER AIMING</div>
-</div>
-
-<!-- 2. MAP -->
-<div id="map" class="screen">
-<div class="map-top"><b>🪙 245</b><b>⭐ Collect Stars<br>9/20</b><b>🎁</b></div>
-<div style="background:#fff;margin:10px;border-radius:12px;padding:8px;font-weight:bold">LEVEL 232 - POP ALL BUBBLES!</div>
-<div class="path">
-<div class="lvl done" style="left:20%;top:0">236</div>
-<div class="lvl done" style="left:65%;top:30px">235</div>
-<div class="lvl done" style="left:15%;top:110px">234</div>
-<div class="lvl" style="left:60%;top:150px">233</div>
-<div class="lvl now" style="left:30%;top:240px">232</div>
-<div class="lvl done" style="left:65%;top:320px">231</div>
-<div class="lvl done" style="left:20%;top:390px">230</div>
-</div>
-<button class="playBtn" onclick="showGame()">▶ LEVEL 232 - PLAY</button>
-<p style="margin-top:8px;font-size:13px;color:#333">Teri Video Wala Map - Aise Hi Level Khulenge</p>
-</div>
-
-<!-- 3. GAME -->
-<div id="game" class="screen">
-<div class="game-top"><b>☰</b><b>⭐ <span id="stars">0</span></b><div id="prog"><div id="progFill"></div></div><b id="score">0</b></div>
-<div style="font-weight:bold;color:#4c1d95;padding:5px">POP ALL BUBBLES - LEVEL 232</div>
+*{margin:0;box-sizing:border-box} body{background:#7AA8FF;font-family:Arial;text-align:center;overflow:hidden}
+.top{background:linear-gradient(#2A3A7A,#1E2A5A);color:#fff;display:flex;align-items:center;gap:8px;padding:9px;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.top .bar{flex:1;height:18px;background:#0B1230;border-radius:10px;overflow:hidden;box-shadow:inset 0 2px 5px #000} #fill{height:100%;width:0%;background:linear-gradient(#FFE600,#FFAA00);border-radius:10px}
+canvas{display:block;margin:0 auto;background:linear-gradient(180deg,#C4D8FF 0%,#9AB8FF 50%,#7AA8FF 100%);touch-action:none}
+.bottom{background:linear-gradient(#FFFFFF,#D6E4FF);display:flex;justify-content:center;gap:8px;padding:10px;box-shadow:0 -4px 10px rgba(0,0,0,.2)}
+.b{background:linear-gradient(#FFFFFF,#E0EAFD);border:0;border-radius:14px;padding:10px 12px;font-weight:900;font-size:13px;box-shadow:0 4px 0 #9AA8C7,0 6px 8px rgba(0,0,0,.25)}
+.b:active{transform:translateY(3px);box-shadow:0 1px 0 #9AA8C7}
+</style></head><body>
+<div class="top"><b>⬅</b><b style="text-shadow:0 2px 0 #000">⭐ 0</b><div class="bar"><div id="fill"></div></div><b id="sc" style="text-shadow:0 2px 0 #000">0</b><b>⚙️</b></div>
+<div style="color:#fff;font-weight:900;padding:6px;text-shadow:0 2px 0 #5A1A9E">LEVEL 232 • POP ALL BUBBLES!</div>
 <canvas id="c" width="360" height="500"></canvas>
-<div class="controls">
-<button class="cbtn" onclick="useBomb()">💣 <b id="bombN">20</b></button>
-<button class="cbtn" onclick="useRainbow()">🌈 <b id="rainN">1</b></button>
-<button class="cbtn" onclick="useFire()">🔥 Fireball <b id="fireN">1</b></button>
-<button class="cbtn">Bache: <b id="moves">55</b></button>
+<div class="bottom">
+<button class="b" onclick="bomb()">💣 <span id="bn">20</span></button>
+<button class="b">🌈 1</button>
+<button class="b" onclick="fire()">🔥 Fireball <span id="fn">1</span></button>
+<div class="b">Bache: <span id="mv">55</span></div>
 </div>
-</div>
-
-<div id="popMsg"><div><h2 id="popT">POP ALL BUBBLES!</h2><p id="popP">3 Same Colour Milao, Sab Phoot Jayenge!</p><button onclick="closePop()">START ▶</button></div></div>
-
 <script>
-let fill=document.getElementById('fill'), p=0;
-let li=setInterval(()=>{p+=12; fill.style.width=p+'%'; if(p>=100){clearInterval(li); document.getElementById('load').classList.remove('active'); document.getElementById('map').classList.add('active');}},300);
-
-function showGame(){
-  document.getElementById('map').classList.remove('active');
-  document.getElementById('game').classList.add('active');
-  document.getElementById('popMsg').style.display='flex';
-}
-function closePop(){document.getElementById('popMsg').style.display='none';}
-
-const cv=document.getElementById('c'), ctx=cv.getContext('2d');
-const R=17, COLORS=['#ff0090','#22c55e','#00d5ff','#a855f7','#64748b','#ffd700','#ff3b30'];
-let grid=[], score=0, moves=55, combo=0, fire=1, bombs=20, over=false;
-let cur={color:0}, nxt={color:1}, aim={x:180,y:120,show:false}, flying=null, falling=[];
+const cv=document.getElementById('c'),x=cv.getContext('2d'),R=19;
+const COL={0:['#FF4DC4','#D4008F','#7A0053'],1:['#7CFF8A','#22C55E','#0A6B24'],2:['#8AF5FF','#00D5FF','#007A9E'],3:['#E2A6FF','#A855F7','#5B1A9E'],4:['#CBD5E1','#64748B','#2B3646'],5:['#FFF07A','#FFD700','#B89A00']};
+let g=[],score=0,moves=55,fireN=1,bombN=20,cur=0,nxt=1,aim={x:180,y:100,show:false},fly=null,fall=[];
 function rc(){return Math.floor(Math.random()*5)}
-function init(){
-  for(let r=0;r<7;r++){let row=[]; for(let c=0;c<10-(r%2?1:0);c++) row.push(rc()); grid.push(row);}
-  cur.color=rc(); nxt.color=rc();
-}
-function pos(r,c){return {x:22+c*(R*2)+(r%2?R:0), y:28+r*(R*2-3)}}
-function bubble(x,y,col,r=R){
-  let g=ctx.createRadialGradient(x-6,y-7,2,x,y,r);
-  g.addColorStop(0,'#ffffff'); g.addColorStop(0.25,col); g.addColorStop(1,col);
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.beginPath(); ctx.arc(x-6,y-7,4,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fill();
+for(let r=0;r<6;r++){let row=[];for(let c=0;c<10-(r%2?1:0);c++)row.push(rc());g.push(row)} cur=rc();nxt=rc();
+function P(r,c){return {x:23+c*37+(r%2?18:0),y:32+r*34}}
+function bub3d(px,py,colIdx,r=R){
+ let col=COL[colIdx];
+ // shadow neeche
+ x.beginPath(); x.ellipse(px,py+r+2,r*0.8,4,0,0,7); x.fillStyle='rgba(0,0,0,0.25)'; x.fill();
+ // main 3D gola - radial gradient
+ let gr=x.createRadialGradient(px-r*0.4,py-r*0.5,r*0.1,px,py,r);
+ gr.addColorStop(0,'#FFFFFF'); gr.addColorStop(0.18,col[0]); gr.addColorStop(0.55,col[1]); gr.addColorStop(1,col[2]);
+ x.beginPath(); x.arc(px,py,r,0,7); x.fillStyle=gr; x.fill();
+ // upar chamak - kaanch wali
+ x.beginPath(); x.ellipse(px-r*0.35,py-r*0.45,r*0.38,r*0.22,-0.6,0,7); x.fillStyle='rgba(255,255,255,0.95)'; x.fill();
+ x.beginPath(); x.ellipse(px+r*0.2,py+r*0.45,r*0.18,r*0.08,0.4,0,7); x.fillStyle='rgba(255,255,255,0.35)'; x.fill();
+ // outline 3D
+ x.beginPath(); x.arc(px,py,r,0,7); x.strokeStyle='rgba(255,255,255,0.8)'; x.lineWidth=1.2; x.stroke();
 }
 function draw(){
-  ctx.clearRect(0,0,360,500);
-  for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++) if(grid[r][c]!=null){let p=pos(r,c); bubble(p.x,p.y,COLORS[grid[r][c]]);}
-  falling.forEach(f=>{f.y+=6; bubble(f.x,f.y,COLORS[f.color])});
-  falling=falling.filter(f=>f.y<560);
-  if(aim.show){
-    ctx.fillStyle='#7b2ff7';
-    let dx=aim.x-180, dy=aim.y-485, len=Math.hypot(dx,dy);
-    for(let i=0;i<18;i++){let t=i/18; ctx.beginPath(); ctx.arc(180+dx*t,485+dy*t,3.5,0,Math.PI*2); ctx.fill();}
-  }
-  if(flying) bubble(flying.x,flying.y,COLORS[flying.color]);
-  // shooter base
-  ctx.beginPath(); ctx.arc(180,485,28,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
-  bubble(180,485,COLORS[cur.color],20);
-  bubble(232,492,COLORS[nxt.color],13);
-  requestAnimationFrame(draw);
+ x.clearRect(0,0,360,500);
+ for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null){let p=P(r,c);bub3d(p.x,p.y,g[r][c])}
+ fall.forEach(f=>{f.y+=7;f.rot=(f.rot||0)+0.1;bub3d(f.x,f.y,f.color)}); fall=fall.filter(f=>f.y<560);
+ if(aim.show){
+   x.fillStyle='#7B2FF7'; let dx=aim.x-180,dy=aim.y-485,l=Math.hypot(dx,dy);
+   for(let i=0;i<16;i++){let t=i/16; x.beginPath(); x.arc(180+dx/l*300*t,485+dy/l*300*t,3.8,0,7); x.fill(); x.beginPath(); x.arc(180+dx/l*300*t-1,485+dy/l*300*t-1,1.5,0,7); x.fillStyle='#fff'; x.fill(); x.fillStyle='#7B2FF7';}
+ }
+ if(fly)bub3d(fly.x,fly.y,fly.color);
+ // 3D Shooter base - bada ring
+ x.beginPath(); x.arc(180,485,32,0,7); x.fillStyle='rgba(0,0,0,0.2)'; x.fill();
+ let sg=x.createLinearGradient(148,453,212,517); sg.addColorStop(0,'#fff'); sg.addColorStop(1,'#9AA8C7');
+ x.beginPath(); x.arc(180,485,30,0,7); x.fillStyle=sg; x.fill(); x.lineWidth=2; x.strokeStyle='#1E2A5A'; x.stroke();
+ bub3d(180,485,cur,21);
+ // next bubble 3D chhota
+ x.beginPath(); x.arc(238,492,16,0,7); x.fillStyle='#fff'; x.fill();
+ bub3d(238,492,nxt,13);
+ requestAnimationFrame(draw);
 }
-function neighbors(r,c){
-  let off=r%2?[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]]:[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
-  let out=[]; off.forEach(o=>{let nr=r+o[0],nc=c+o[1]; if(grid[nr]&&grid[nr][nc]!=null) out.push([nr,nc])}); return out;
+function nb(r,c){let o=r%2?[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]]:[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]],a=[];o.forEach(v=>{let nr=r+v[0],nc=c+v[1];if(g[nr]&&g[nr][nc]!=null)a.push([nr,nc])});return a}
+function cl(r,c,col,v=new Set()){let k=r+','+c;if(v.has(k))return[];v.add(k);let o=[[r,c]];nb(r,c).forEach(([nr,nc])=>{if(g[nr][nc]===col)o.push(...cl(nr,nc,col,v))});return o}
+function drop(){let con=new Set();for(let c=0;c<g[0].length;c++)if(g[0][c]!=null){let s=[[0,c]];con.add('0,'+c);while(s.length){let [r,cc]=s.pop();nb(r,cc).forEach(([nr,nc])=>{let k=nr+','+nc;if(!con.has(k)&&g[nr][nc]!=null){con.add(k);s.push([nr,nc])}})}}
+ for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null&&!con.has(r+','+c)){fall.push({...P(r,c),color:g[r][c]});g[r][c]=null;score+=60}}
+function place(px,py,col){
+ let best=null,bd=1e9;for(let r=0;r<9;r++){if(!g[r])g[r]=Array(10-(r%2?1:0)).fill(null);for(let c=0;c<g[r].length;c++)if(g[r][c]==null){let p=P(r,c),d=(p.x-px)**2+(p.y-py)**2;if(d<bd){bd=d;best=[r,c]}}}
+ let [r,c]=best;g[r][c]=col;let cc=cl(r,c,col);if(cc.length>=3){cc.forEach(([rr,cc2])=>g[rr][cc2]=null);score+=cc.length*120}
+ drop();moves--;document.getElementById('mv').innerText=moves;document.getElementById('sc').innerText=score;document.getElementById('fill').style.width=Math.min(score/2500*100,100)+'%';
+ cur=nxt;nxt=rc();if(g.flat().filter(v=>v!=null).length===0)alert('YOU POPPED ALL BUBBLES! 🎉 Score: '+score);
 }
-function cluster(r,c,col,vis=new Set()){
-  let k=r+','+c; if(vis.has(k)) return []; vis.add(k); let out=[[r,c]];
-  neighbors(r,c).forEach(([nr,nc])=>{if(grid[nr][nc]===col) out.push(...cluster(nr,nc,col,vis))}); return out;
-}
-function dropFloat(){
-  let conn=new Set();
-  for(let c=0;c<grid[0].length;c++) if(grid[0][c]!=null){
-    let st=[[0,c]]; conn.add('0,'+c);
-    while(st.length){let [r,cc]=st.pop(); neighbors(r,cc).forEach(([nr,nc])=>{let k=nr+','+nc; if(!conn.has(k)&&grid[nr][nc]!=null){conn.add(k); st.push([nr,nc])}})}
-  }
-  for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++) if(grid[r][c]!=null && !conn.has(r+','+c)){falling.push({...pos(r,c),color:grid[r][c]}); grid[r][c]=null; score+=60;}
-}
-function place(x,y,col){
-  let best=null,bd=1e9;
-  for(let r=0;r<9;r++){ if(!grid[r]) grid[r]=Array(10-(r%2?1:0)).fill(null);
-    for(let c=0;c<grid[r].length;c++) if(grid[r][c]==null){let p=pos(r,c); let d=(p.x-x)**2+(p.y-y)**2; if(d<bd){bd=d; best=[r,c]}}}
-  if(!best) return; let [r,c]=best; grid[r][c]=col;
-  let cl=cluster(r,c,col);
-  if(cl.length>=3){ cl.forEach(([rr,cc])=>grid[rr][cc]=null); score+=cl.length*120; combo++; if(combo>=3){fire++; document.getElementById('fireN').innerText=fire; combo=0;} }
-  else combo=0;
-  dropFloat(); moves--; document.getElementById('moves').innerText=moves;
-  document.getElementById('score').innerText=score;
-  document.getElementById('progFill').style.width=Math.min(score/2500*100,100)+'%';
-  document.getElementById('stars').innerText=score>1500?3:score>800?2:score>300?1:0;
-  cur.color=nxt.color; nxt.color=rc();
-  let left=grid.flat().filter(v=>v!=null).length;
-  if(left===0){over=true; document.getElementById('popT').innerText='YOU POPPED ALL BUBBLES! 🎉'; document.getElementById('popP').innerText='Score: '+score+' - LEVEL COMPLETED!'; document.getElementById('popMsg').style.display='flex';}
-  if(moves<=0&&left>0){over=true; document.getElementById('popT').innerText='GAME OVER 😢'; document.getElementById('popP').innerText='Score: '+score; document.getElementById('popMsg').style.display='flex';}
-}
-function shoot(){
-  if(over||flying) return;
-  let dx=aim.x-180, dy=aim.y-485, len=Math.hypot(dx,dy); dx/=len; dy/=len;
-  flying={x:180,y:485,color:cur.color,dx:dx*8,dy:dy*8};
-  let iv=setInterval(()=>{
-    flying.x+=flying.dx; flying.y+=flying.dy;
-    if(flying.x<R||flying.x>360-R) flying.dx*=-1;
-    if(flying.y<28){place(flying.x,flying.y,flying.color); flying=null; clearInterval(iv); return;}
-    for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++) if(grid[r][c]!=null){let p=pos(r,c); if(Math.hypot(p.x-flying.x,p.y-flying.y)<R*2-2){place(flying.x,flying.y,flying.color); flying=null; clearInterval(iv); return;}}
-  },16);
-}
-function useBomb(){ if(bombs<=0) return; bombs--; document.getElementById('bombN').innerText=bombs; let cnt=0; for(let r=2;r<5&&cnt<8;r++) for(let c=0;c<grid[r].length&&cnt<8;c++) if(grid[r][c]!=null){grid[r][c]=null;cnt++;score+=100} dropFloat(); document.getElementById('score').innerText=score; }
-function useFire(){ if(fire<=0) return alert('Pehle 3 baar lagatar phodo!'); fire--; document.getElementById('fireN').innerText=fire; for(let c=0;c<grid[2].length;c++) grid[2][c]=null; dropFloat(); score+=500; document.getElementById('score').innerText=score; }
-function useRainbow(){ alert('🌈 Rainbow Bubble - Kisi bhi colour se mil jayega! Agli baar use hoga'); }
-cv.addEventListener('pointermove',e=>{let rect=cv.getBoundingClientRect(); aim.x=e.clientX-rect.left; aim.y=e.clientY-rect.top; aim.show=true;});
-cv.addEventListener('click',()=>{if(aim.show) shoot();});
-init(); draw();
-</script>
-</body>
-</html>
+function shoot(){if(fly)return;let dx=aim.x-180,dy=aim.y-485,l=Math.hypot(dx,dy);dx/=l;dy/=l;fly={x:180,y:485,color:cur,dx:dx*8,dy:dy*8};
+ let iv=setInterval(()=>{fly.x+=fly.dx;fly.y+=fly.dy;if(fly.x<R||fly.x>360-R)fly.dx*=-1;if(fly.y<30){place(fly.x,fly.y,fly.color);fly=null;clearInterval(iv);return}
+ for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null){let p=P(r,c);if(Math.hypot(p.x-fly.x,p.y-fly.y)<36){place(fly.x,fly.y,fly.color);fly=null;clearInterval(iv);return}}},16)}
+function bomb(){if(bombN<=0)return;bombN--;document.getElementById('bn').innerText=bombN;let n=0;for(let r=2;r<5&&n<8;r++)for(let c=0;c<g[r].length&&n<8;c++)if(g[r][c]!=null){g[r][c]=null;n++;score+=100}drop();document.getElementById('sc').innerText=score}
+function fire(){if(fireN<=0)return;fireN--;document.getElementById('fn').innerText=fireN;for(let c=0;c<g[2].length;c++)g[2][c]=null;drop();score+=500;document.getElementById('sc').innerText=score}
+cv.addEventListener('pointermove',e=>{let r=cv.getBoundingClientRect();aim.x=e.clientX-r.left;aim.y=e.clientY-r.top;aim.show=true});
+cv.addEventListener('click',shoot);draw();
+</script></body></html>
