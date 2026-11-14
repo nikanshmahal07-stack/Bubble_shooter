@@ -3,169 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Bubble Pop Master</title>
+<title>Bubble Pop Master - Video Wala</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#a8c8ff;font-family:Arial;text-align:center;overflow:hidden}
-.top{background:#2b3a67;color:#fff;padding:8px;display:flex;justify-content:space-between;align-items:center}
-.top b{font-size:18px}
-#scoreBar{height:14px;background:#fff;border-radius:10px;overflow:hidden;flex:1;margin:0 10px}
-#scoreFill{height:100%;width:0%;background:#ffd700}
-canvas{background:linear-gradient(#cfe4ff,#a8c8ff);display:block;margin:auto;touch-action:none}
-.bottom{display:flex;justify-content:center;gap:10px;padding:8px}
-.btn{background:#fff;border:2px solid #2b3a67;border-radius:12px;padding:10px 14px;font-weight:bold;font-size:14px}
-.btn span{color:red}
-#msg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:10}
-#msg div{background:#fff;padding:25px;border-radius:20px;max-width:90%}
-#msg h1{color:#7b2ff7}
-button{padding:14px 25px;border:0;border-radius:30px;background:#22c55e;color:#fff;font-size:18px;font-weight:bold;margin-top:12px}
+body{font-family:Arial;background:#a9c6ff;text-align:center;overflow:hidden}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+#load{background:linear-gradient(#8db4ff,#c9dcff);padding-top:80px}
+#load h1{font-size:42px;color:#e60000;text-shadow:2px 2px 0 #fff;line-height:0.9}
+#load h1 span{font-size:22px;color:#00a2e8;letter-spacing:3px}
+.loader{width:90px;height:90px;border:10px dotted #4a4ae0;border-radius:50%;margin:40px auto;animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#load p{font-size:20px;color:#fff;font-weight:bold}
+.bar{width:80%;height:28px;background:#6a5acd;border-radius:20px;margin:25px auto;overflow:hidden;border:3px solid #fff}
+#fill{height:100%;width:0%;background:#a855f7;border-radius:20px;transition:width .3s}
+.tip{background:rgba(255,255,255,.7);margin:20px;padding:12px;font-weight:bold}
+/* MAP */
+#map{background:#b9a5ff;padding:10px}
+.map-top{background:#fff;border-radius:15px;padding:10px;display:flex;justify-content:space-between;align-items:center}
+.coins{background:#ffd700;padding:6px 12px;border-radius:20px;font-weight:bold}
+.path{position:relative;height:480px;margin-top:10px}
+.lvl{position:absolute;width:52px;height:52px;border-radius:50%;background:#9d4edd;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid #fff;box-shadow:0 4px 0 #5a1a9e}
+.lvl.done{background:#7c3aed}
+.lvl.now{background:#22c55e;width:64px;height:64px;font-size:18px;border-color:#ffe600}
+.playBtn{background:#22c55e;color:#fff;border:0;padding:16px 40px;border-radius:12px;font-size:22px;font-weight:bold;margin-top:10px;box-shadow:0 5px 0 #15803d}
+/* GAME */
+#game{background:linear-gradient(#cfe0ff,#a9c6ff)}
+.game-top{background:#1e2a5a;color:#fff;padding:8px;display:flex;justify-content:space-between}
+#prog{flex:1;height:14px;background:#fff;border-radius:10px;margin:0 10px;overflow:hidden}
+#progFill{height:100%;width:0%;background:#ffd700}
+canvas{display:block;margin:auto;background:transparent;touch-action:none}
+.controls{display:flex;justify-content:center;gap:8px;padding:8px}
+.cbtn{background:#fff;border:2px solid #1e2a5a;border-radius:12px;padding:10px;font-size:14px;font-weight:bold}
+.cbtn b{color:red}
+#popMsg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20}
+#popMsg div{background:#fff;padding:22px;border-radius:18px;width:85%;max-width:340px}
+#popMsg h2{color:#a21caf;font-size:26px}
+button{padding:13px 25px;border:0;border-radius:30px;background:#22c55e;color:#fff;font-size:18px;font-weight:bold;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="top"><b>⭐ <span id="stars">0</span></b><div id="scoreBar"><div id="scoreFill"></div></div><b id="score">0</b></div>
-<div style="padding:6px;font-weight:bold;color:#4c1d95">POP ALL BUBBLES • LEVEL 1</div>
-<canvas id="c" width="360" height="520"></canvas>
-<div class="bottom">
-<button class="btn" onclick="useBomb()">💣 Bomb <span id="bombN">3</span></button>
-<button class="btn" onclick="useFire()">🔥 Fireball <span id="fireN">1</span></button>
-<div class="btn">Bache: <span id="moves">40</span></div>
-</div>
-<div id="msg"><div><h1 id="msgT">YOU DID IT!</h1><p id="msgP"></p><button onclick="location.reload()">NEXT LEVEL ▶</button></div></div>
-<script>
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-const R=16, COLS=10;
-const COLORS=['#ff2d95','#22c55e','#06b6d4','#a855f7','#facc15','#64748b'];
-let grid=[], score=0, moves=40, combo=0, fire=1, bombs=3, gameOver=false;
-let cur={color:0,x:180,y:485}, next={color:1};
-let aim={x:180,y:100,show:false}, flying=null, falling=[];
 
-function randColor(){return Math.floor(Math.random()*5)}
-function init(){
-  for(let r=0;r<6;r++){
-    let row=[];
-    for(let c=0;c<COLS-(r%2?1:0);c++) row.push(randColor());
-    grid.push(row);
-  }
-  cur.color=randColor(); next.color=randColor();
+<!-- 1. LOADING -->
+<div id="load" class="screen active">
+<h1>💚 Bubble<br><span>POP MASTER</span></h1>
+<div class="loader"></div>
+<p>Getting things ready for you...</p>
+<div class="bar"><div id="fill"></div></div>
+<div class="tip">TIP: USE THE WALLS TO BOUNCE<br>OFF BUBBLES FOR BETTER AIMING</div>
+</div>
+
+<!-- 2. MAP -->
+<div id="map" class="screen">
+<div class="map-top"><b>🪙 245</b><b>⭐ Collect Stars<br>9/20</b><b>🎁</b></div>
+<div style="background:#fff;margin:10px;border-radius:12px;padding:8px;font-weight:bold">LEVEL 232 - POP ALL BUBBLES!</div>
+<div class="path">
+<div class="lvl done" style="left:20%;top:0">236</div>
+<div class="lvl done" style="left:65%;top:30px">235</div>
+<div class="lvl done" style="left:15%;top:110px">234</div>
+<div class="lvl" style="left:60%;top:150px">233</div>
+<div class="lvl now" style="left:30%;top:240px">232</div>
+<div class="lvl done" style="left:65%;top:320px">231</div>
+<div class="lvl done" style="left:20%;top:390px">230</div>
+</div>
+<button class="playBtn" onclick="showGame()">▶ LEVEL 232 - PLAY</button>
+<p style="margin-top:8px;font-size:13px;color:#333">Teri Video Wala Map - Aise Hi Level Khulenge</p>
+</div>
+
+<!-- 3. GAME -->
+<div id="game" class="screen">
+<div class="game-top"><b>☰</b><b>⭐ <span id="stars">0</span></b><div id="prog"><div id="progFill"></div></div><b id="score">0</b></div>
+<div style="font-weight:bold;color:#4c1d95;padding:5px">POP ALL BUBBLES - LEVEL 232</div>
+<canvas id="c" width="360" height="500"></canvas>
+<div class="controls">
+<button class="cbtn" onclick="useBomb()">💣 <b id="bombN">20</b></button>
+<button class="cbtn" onclick="useRainbow()">🌈 <b id="rainN">1</b></button>
+<button class="cbtn" onclick="useFire()">🔥 Fireball <b id="fireN">1</b></button>
+<button class="cbtn">Bache: <b id="moves">55</b></button>
+</div>
+</div>
+
+<div id="popMsg"><div><h2 id="popT">POP ALL BUBBLES!</h2><p id="popP">3 Same Colour Milao, Sab Phoot Jayenge!</p><button onclick="closePop()">START ▶</button></div></div>
+
+<script>
+let fill=document.getElementById('fill'), p=0;
+let li=setInterval(()=>{p+=12; fill.style.width=p+'%'; if(p>=100){clearInterval(li); document.getElementById('load').classList.remove('active'); document.getElementById('map').classList.add('active');}},300);
+
+function showGame(){
+  document.getElementById('map').classList.remove('active');
+  document.getElementById('game').classList.add('active');
+  document.getElementById('popMsg').style.display='flex';
 }
-function pos(r,c){return {x:20+c*(R*2)+(r%2?R:0), y:30+r*(R*2-4)}}
+function closePop(){document.getElementById('popMsg').style.display='none';}
+
+const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+const R=17, COLORS=['#ff0090','#22c55e','#00d5ff','#a855f7','#64748b','#ffd700','#ff3b30'];
+let grid=[], score=0, moves=55, combo=0, fire=1, bombs=20, over=false;
+let cur={color:0}, nxt={color:1}, aim={x:180,y:120,show:false}, flying=null, falling=[];
+function rc(){return Math.floor(Math.random()*5)}
+function init(){
+  for(let r=0;r<7;r++){let row=[]; for(let c=0;c<10-(r%2?1:0);c++) row.push(rc()); grid.push(row);}
+  cur.color=rc(); nxt.color=rc();
+}
+function pos(r,c){return {x:22+c*(R*2)+(r%2?R:0), y:28+r*(R*2-3)}}
+function bubble(x,y,col,r=R){
+  let g=ctx.createRadialGradient(x-6,y-7,2,x,y,r);
+  g.addColorStop(0,'#ffffff'); g.addColorStop(0.25,col); g.addColorStop(1,col);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x-6,y-7,4,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.95)'; ctx.fill();
+}
 function draw(){
-  ctx.clearRect(0,0,360,520);
-  // grid
-  for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++){
-    if(grid[r][c]==null) continue;
-    let p=pos(r,c); bubble(p.x,p.y,COLORS[grid[r][c]]);
-  }
-  // falling
-  falling.forEach(f=>{f.y+=5; bubble(f.x,f.y,COLORS[f.color])});
+  ctx.clearRect(0,0,360,500);
+  for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++) if(grid[r][c]!=null){let p=pos(r,c); bubble(p.x,p.y,COLORS[grid[r][c]]);}
+  falling.forEach(f=>{f.y+=6; bubble(f.x,f.y,COLORS[f.color])});
   falling=falling.filter(f=>f.y<560);
-  // aim line
   if(aim.show){
-    ctx.setLineDash([6,6]); ctx.strokeStyle='#7b2ff7'; ctx.beginPath();
-    ctx.moveTo(180,485); ctx.lineTo(aim.x,aim.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#7b2ff7';
+    let dx=aim.x-180, dy=aim.y-485, len=Math.hypot(dx,dy);
+    for(let i=0;i<18;i++){let t=i/18; ctx.beginPath(); ctx.arc(180+dx*t,485+dy*t,3.5,0,Math.PI*2); ctx.fill();}
   }
-  if(flying){ bubble(flying.x,flying.y,COLORS[flying.color]); }
-  // shooter
-  bubble(180,485,COLORS[cur.color]);
-  bubble(230,490,COLORS[next.color],12);
-  ctx.fillStyle='#2b3a67'; ctx.font='bold 13px Arial'; ctx.fillText('NEXT',215,515);
+  if(flying) bubble(flying.x,flying.y,COLORS[flying.color]);
+  // shooter base
+  ctx.beginPath(); ctx.arc(180,485,28,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  bubble(180,485,COLORS[cur.color],20);
+  bubble(232,492,COLORS[nxt.color],13);
   requestAnimationFrame(draw);
 }
-function bubble(x,y,col,r=R){
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=2; ctx.stroke();
-  ctx.beginPath(); ctx.arc(x-5,y-6,4,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fill();
-}
 function neighbors(r,c){
-  let n=[]; let off=r%2?[[ -1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]]:[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
-  off.forEach(o=>{let nr=r+o[0],nc=c+o[1]; if(grid[nr]&&grid[nr][nc]!=null) n.push([nr,nc])});
-  return n;
+  let off=r%2?[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]]:[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
+  let out=[]; off.forEach(o=>{let nr=r+o[0],nc=c+o[1]; if(grid[nr]&&grid[nr][nc]!=null) out.push([nr,nc])}); return out;
 }
-function findCluster(r,c,color,vis=new Set()){
-  let key=r+','+c; if(vis.has(key)) return []; vis.add(key);
-  let out=[[r,c]];
-  neighbors(r,c).forEach(([nr,nc])=>{ if(grid[nr][nc]===color) out.push(...findCluster(nr,nc,color,vis)); });
-  return out;
+function cluster(r,c,col,vis=new Set()){
+  let k=r+','+c; if(vis.has(k)) return []; vis.add(k); let out=[[r,c]];
+  neighbors(r,c).forEach(([nr,nc])=>{if(grid[nr][nc]===col) out.push(...cluster(nr,nc,col,vis))}); return out;
 }
-function dropFloating(){
-  let vis=new Set(), q=[[0,0]]; vis.add('0,0');
-  // BFS from top
-  let stack=[[0,0]]; let seen=new Set(['0,0']);
-  // simple: mark all connected to top row
-  let connected=new Set();
+function dropFloat(){
+  let conn=new Set();
   for(let c=0;c<grid[0].length;c++) if(grid[0][c]!=null){
-    let st=[[0,c]]; connected.add('0,'+c);
-    while(st.length){let [r,cc]=st.pop(); neighbors(r,cc).forEach(([nr,nc])=>{let k=nr+','+nc; if(!connected.has(k)&&grid[nr][nc]!=null){connected.add(k); st.push([nr,nc])}})}
+    let st=[[0,c]]; conn.add('0,'+c);
+    while(st.length){let [r,cc]=st.pop(); neighbors(r,cc).forEach(([nr,nc])=>{let k=nr+','+nc; if(!conn.has(k)&&grid[nr][nc]!=null){conn.add(k); st.push([nr,nc])}})}
   }
-  for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++){
-    if(grid[r][c]!=null && !connected.has(r+','+c)){
-      falling.push({...pos(r,c),color:grid[r][c]}); grid[r][c]=null; score+=50;
-    }
-  }
+  for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++) if(grid[r][c]!=null && !conn.has(r+','+c)){falling.push({...pos(r,c),color:grid[r][c]}); grid[r][c]=null; score+=60;}
 }
-function place(x,y,color){
+function place(x,y,col){
   let best=null,bd=1e9;
-  for(let r=0;r<10;r++) for(let c=0;c<(grid[r]?grid[r].length:COLS);c++){
-    if(!grid[r]) grid[r]=Array(COLS-(r%2?1:0)).fill(null);
-    if(grid[r][c]!=null) continue;
-    let p=pos(r,c); let d=(p.x-x)**2+(p.y-y)**2;
-    if(d<bd){bd=d; best=[r,c]}
-  }
-  if(!best) return;
-  let [r,c]=best; grid[r][c]=color;
-  let cl=findCluster(r,c,color);
-  if(cl.length>=3){
-    cl.forEach(([rr,cc])=>grid[rr][cc]=null);
-    score+=cl.length*100; combo++;
-    if(combo>=3){ fire++; document.getElementById('fireN').innerText=fire; combo=0; alert('🔥 FIREBALL MIL GAYA!'); }
-  } else combo=0;
-  dropFloating();
-  moves--; document.getElementById('moves').innerText=moves;
+  for(let r=0;r<9;r++){ if(!grid[r]) grid[r]=Array(10-(r%2?1:0)).fill(null);
+    for(let c=0;c<grid[r].length;c++) if(grid[r][c]==null){let p=pos(r,c); let d=(p.x-x)**2+(p.y-y)**2; if(d<bd){bd=d; best=[r,c]}}}
+  if(!best) return; let [r,c]=best; grid[r][c]=col;
+  let cl=cluster(r,c,col);
+  if(cl.length>=3){ cl.forEach(([rr,cc])=>grid[rr][cc]=null); score+=cl.length*120; combo++; if(combo>=3){fire++; document.getElementById('fireN').innerText=fire; combo=0;} }
+  else combo=0;
+  dropFloat(); moves--; document.getElementById('moves').innerText=moves;
   document.getElementById('score').innerText=score;
-  document.getElementById('scoreFill').style.width=Math.min(score/2000*100,100)+'%';
+  document.getElementById('progFill').style.width=Math.min(score/2500*100,100)+'%';
   document.getElementById('stars').innerText=score>1500?3:score>800?2:score>300?1:0;
-  cur.color=next.color; next.color=randColor();
-  checkEnd();
-}
-function checkEnd(){
+  cur.color=nxt.color; nxt.color=rc();
   let left=grid.flat().filter(v=>v!=null).length;
-  if(left===0){ document.getElementById('msg').style.display='flex'; document.getElementById('msgT').innerText='YOU POPPED ALL BUBBLES! 🎉'; document.getElementById('msgP').innerText='Score: '+score+' | Level Completed!'; gameOver=true; }
-  if(moves<=0 && left>0){ document.getElementById('msg').style.display='flex'; document.getElementById('msgT').innerText='GAME OVER 😢'; document.getElementById('msgP').innerText='Score: '+score+' | Phir se try karo!'; gameOver=true; }
+  if(left===0){over=true; document.getElementById('popT').innerText='YOU POPPED ALL BUBBLES! 🎉'; document.getElementById('popP').innerText='Score: '+score+' - LEVEL COMPLETED!'; document.getElementById('popMsg').style.display='flex';}
+  if(moves<=0&&left>0){over=true; document.getElementById('popT').innerText='GAME OVER 😢'; document.getElementById('popP').innerText='Score: '+score; document.getElementById('popMsg').style.display='flex';}
 }
 function shoot(){
-  if(gameOver||flying) return;
-  let dx=aim.x-180, dy=aim.y-485; let len=Math.hypot(dx,dy); dx/=len; dy/=len;
-  flying={x:180,y:485,color:cur.color,dx:dx*7,dy:dy*7};
+  if(over||flying) return;
+  let dx=aim.x-180, dy=aim.y-485, len=Math.hypot(dx,dy); dx/=len; dy/=len;
+  flying={x:180,y:485,color:cur.color,dx:dx*8,dy:dy*8};
   let iv=setInterval(()=>{
     flying.x+=flying.dx; flying.y+=flying.dy;
     if(flying.x<R||flying.x>360-R) flying.dx*=-1;
-    if(flying.y<25){ place(flying.x,flying.y,flying.color); flying=null; clearInterval(iv); return; }
-    // collision with grid
-    for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++){
-      if(grid[r][c]==null) continue;
-      let p=pos(r,c); if(Math.hypot(p.x-flying.x,p.y-flying.y)<R*2-2){ place(flying.x,flying.y,flying.color); flying=null; clearInterval(iv); return; }
-    }
+    if(flying.y<28){place(flying.x,flying.y,flying.color); flying=null; clearInterval(iv); return;}
+    for(let r=0;r<grid.length;r++) for(let c=0;c<grid[r].length;c++) if(grid[r][c]!=null){let p=pos(r,c); if(Math.hypot(p.x-flying.x,p.y-flying.y)<R*2-2){place(flying.x,flying.y,flying.color); flying=null; clearInterval(iv); return;}}
   },16);
 }
-function useBomb(){
-  if(bombs<=0) return alert('Bomb khatam!');
-  bombs--; document.getElementById('bombN').innerText=bombs;
-  // middle ke 7 bubble uda do
-  let cnt=0;
-  for(let r=2;r<5&&cnt<7;r++) for(let c=0;c<grid[r].length&&cnt<7;c++) if(grid[r][c]!=null){grid[r][c]=null;cnt++;score+=100}
-  dropFloating(); document.getElementById('score').innerText=score;
-}
-function useFire(){
-  if(fire<=0) return alert('Pehle 3 baar lagatar phodo, Fireball milega!');
-  fire--; document.getElementById('fireN').innerText=fire;
-  // ek poori line uda do
-  for(let c=0;c<grid[2].length;c++) grid[2][c]=null;
-  dropFloating(); score+=500; document.getElementById('score').innerText=score;
-}
-cv.addEventListener('pointermove',e=>{
-  let rect=cv.getBoundingClientRect(); aim.x=e.clientX-rect.left; aim.y=e.clientY-rect.top; aim.show=true;
-});
-cv.addEventListener('click',()=>{ if(aim.show) shoot(); });
+function useBomb(){ if(bombs<=0) return; bombs--; document.getElementById('bombN').innerText=bombs; let cnt=0; for(let r=2;r<5&&cnt<8;r++) for(let c=0;c<grid[r].length&&cnt<8;c++) if(grid[r][c]!=null){grid[r][c]=null;cnt++;score+=100} dropFloat(); document.getElementById('score').innerText=score; }
+function useFire(){ if(fire<=0) return alert('Pehle 3 baar lagatar phodo!'); fire--; document.getElementById('fireN').innerText=fire; for(let c=0;c<grid[2].length;c++) grid[2][c]=null; dropFloat(); score+=500; document.getElementById('score').innerText=score; }
+function useRainbow(){ alert('🌈 Rainbow Bubble - Kisi bhi colour se mil jayega! Agli baar use hoga'); }
+cv.addEventListener('pointermove',e=>{let rect=cv.getBoundingClientRect(); aim.x=e.clientX-rect.left; aim.y=e.clientY-rect.top; aim.show=true;});
+cv.addEventListener('click',()=>{if(aim.show) shoot();});
 init(); draw();
 </script>
 </body>
