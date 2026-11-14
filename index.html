@@ -1,79 +1,24 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>3D Bubble Pop Master</title>
-<style>
-*{margin:0;box-sizing:border-box} body{background:#7AA8FF;font-family:Arial;text-align:center;overflow:hidden}
-.top{background:linear-gradient(#2A3A7A,#1E2A5A);color:#fff;display:flex;align-items:center;gap:8px;padding:9px;box-shadow:0 4px 10px rgba(0,0,0,.4)}
-.top .bar{flex:1;height:18px;background:#0B1230;border-radius:10px;overflow:hidden;box-shadow:inset 0 2px 5px #000} #fill{height:100%;width:0%;background:linear-gradient(#FFE600,#FFAA00);border-radius:10px}
-canvas{display:block;margin:0 auto;background:linear-gradient(180deg,#C4D8FF 0%,#9AB8FF 50%,#7AA8FF 100%);touch-action:none}
-.bottom{background:linear-gradient(#FFFFFF,#D6E4FF);display:flex;justify-content:center;gap:8px;padding:10px;box-shadow:0 -4px 10px rgba(0,0,0,.2)}
-.b{background:linear-gradient(#FFFFFF,#E0EAFD);border:0;border-radius:14px;padding:10px 12px;font-weight:900;font-size:13px;box-shadow:0 4px 0 #9AA8C7,0 6px 8px rgba(0,0,0,.25)}
-.b:active{transform:translateY(3px);box-shadow:0 1px 0 #9AA8C7}
-</style></head><body>
-<div class="top"><b>⬅</b><b style="text-shadow:0 2px 0 #000">⭐ 0</b><div class="bar"><div id="fill"></div></div><b id="sc" style="text-shadow:0 2px 0 #000">0</b><b>⚙️</b></div>
-<div style="color:#fff;font-weight:900;padding:6px;text-shadow:0 2px 0 #5A1A9E">LEVEL 232 • POP ALL BUBBLES!</div>
-<canvas id="c" width="360" height="500"></canvas>
-<div class="bottom">
-<button class="b" onclick="bomb()">💣 <span id="bn">20</span></button>
-<button class="b">🌈 1</button>
-<button class="b" onclick="fire()">🔥 Fireball <span id="fn">1</span></button>
-<div class="b">Bache: <span id="mv">55</span></div>
-</div>
+<title>Bubble Shooter</title>
+<style>body{margin:0;background:#7AA8FF;font-family:Arial;text-align:center}canvas{display:block;margin:auto;background:linear-gradient(#C4D8FF,#7AA8FF);touch-action:none}.top{background:#1E2A5A;color:#fff;padding:10px;font-weight:900}</style></head><body>
+<div class="top">⭐ SCORE: <span id="sc">0</span> • BUBBLE SHOOTER 3D</div>
+<canvas id="c" width="360" height="520"></canvas>
+<div style="padding:10px;font-weight:900;color:#fff">👆 Ungli se AIM karo, chhodo - PHOOT jayega!</div>
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d'),R=19;
-const COL={0:['#FF4DC4','#D4008F','#7A0053'],1:['#7CFF8A','#22C55E','#0A6B24'],2:['#8AF5FF','#00D5FF','#007A9E'],3:['#E2A6FF','#A855F7','#5B1A9E'],4:['#CBD5E1','#64748B','#2B3646'],5:['#FFF07A','#FFD700','#B89A00']};
-let g=[],score=0,moves=55,fireN=1,bombN=20,cur=0,nxt=1,aim={x:180,y:100,show:false},fly=null,fall=[];
+const C=['#FF0090','#22C55E','#00D5FF','#A855F7','#FFD700'];
+let g=[],score=0,cur=0,nxt=1,aim={x:180,y:120,show:false},fly=null,fall=[];
 function rc(){return Math.floor(Math.random()*5)}
-for(let r=0;r<6;r++){let row=[];for(let c=0;c<10-(r%2?1:0);c++)row.push(rc());g.push(row)} cur=rc();nxt=rc();
-function P(r,c){return {x:23+c*37+(r%2?18:0),y:32+r*34}}
-function bub3d(px,py,colIdx,r=R){
- let col=COL[colIdx];
- // shadow neeche
- x.beginPath(); x.ellipse(px,py+r+2,r*0.8,4,0,0,7); x.fillStyle='rgba(0,0,0,0.25)'; x.fill();
- // main 3D gola - radial gradient
- let gr=x.createRadialGradient(px-r*0.4,py-r*0.5,r*0.1,px,py,r);
- gr.addColorStop(0,'#FFFFFF'); gr.addColorStop(0.18,col[0]); gr.addColorStop(0.55,col[1]); gr.addColorStop(1,col[2]);
- x.beginPath(); x.arc(px,py,r,0,7); x.fillStyle=gr; x.fill();
- // upar chamak - kaanch wali
- x.beginPath(); x.ellipse(px-r*0.35,py-r*0.45,r*0.38,r*0.22,-0.6,0,7); x.fillStyle='rgba(255,255,255,0.95)'; x.fill();
- x.beginPath(); x.ellipse(px+r*0.2,py+r*0.45,r*0.18,r*0.08,0.4,0,7); x.fillStyle='rgba(255,255,255,0.35)'; x.fill();
- // outline 3D
- x.beginPath(); x.arc(px,py,r,0,7); x.strokeStyle='rgba(255,255,255,0.8)'; x.lineWidth=1.2; x.stroke();
-}
-function draw(){
- x.clearRect(0,0,360,500);
- for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null){let p=P(r,c);bub3d(p.x,p.y,g[r][c])}
- fall.forEach(f=>{f.y+=7;f.rot=(f.rot||0)+0.1;bub3d(f.x,f.y,f.color)}); fall=fall.filter(f=>f.y<560);
- if(aim.show){
-   x.fillStyle='#7B2FF7'; let dx=aim.x-180,dy=aim.y-485,l=Math.hypot(dx,dy);
-   for(let i=0;i<16;i++){let t=i/16; x.beginPath(); x.arc(180+dx/l*300*t,485+dy/l*300*t,3.8,0,7); x.fill(); x.beginPath(); x.arc(180+dx/l*300*t-1,485+dy/l*300*t-1,1.5,0,7); x.fillStyle='#fff'; x.fill(); x.fillStyle='#7B2FF7';}
- }
- if(fly)bub3d(fly.x,fly.y,fly.color);
- // 3D Shooter base - bada ring
- x.beginPath(); x.arc(180,485,32,0,7); x.fillStyle='rgba(0,0,0,0.2)'; x.fill();
- let sg=x.createLinearGradient(148,453,212,517); sg.addColorStop(0,'#fff'); sg.addColorStop(1,'#9AA8C7');
- x.beginPath(); x.arc(180,485,30,0,7); x.fillStyle=sg; x.fill(); x.lineWidth=2; x.strokeStyle='#1E2A5A'; x.stroke();
- bub3d(180,485,cur,21);
- // next bubble 3D chhota
- x.beginPath(); x.arc(238,492,16,0,7); x.fillStyle='#fff'; x.fill();
- bub3d(238,492,nxt,13);
- requestAnimationFrame(draw);
-}
+for(let r=0;r<6;r++){let row=[];for(let c=0;c<10-(r%2?1:0);c++)row.push(rc());g.push(row)}cur=rc();nxt=rc();
+function P(r,c){return{x:23+c*37+(r%2?18:0),y:35+r*34}}
+function bub(px,py,ci,r=R){let col=C[ci];let gr=x.createRadialGradient(px-7,py-8,1,px,py,r);gr.addColorStop(0,'#fff');gr.addColorStop(.3,col);gr.addColorStop(1,col);x.beginPath();x.arc(px,py,r,0,7);x.fillStyle=gr;x.fill();x.beginPath();x.ellipse(px-6,py-7,6,3,-.6,0,7);x.fillStyle='#fff';x.fill()}
+function draw(){x.clearRect(0,0,360,520);for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null){let p=P(r,c);bub(p.x,p.y,g[r][c])}fall.forEach(f=>{f.y+=7;bub(f.x,f.y,f.color)});fall=fall.filter(f=>f.y<560);if(aim.show){x.fillStyle='#7B2FF7';let dx=aim.x-180,dy=aim.y-500,l=Math.hypot(dx,dy);for(let i=0;i<14;i++){x.beginPath();x.arc(180+dx/l*280*i/14,500+dy/l*280*i/14,3.5,0,7);x.fill()}}if(fly)bub(fly.x,fly.y,fly.color);x.beginPath();x.arc(180,500,28,0,7);x.fillStyle='#fff';x.fill();bub(180,500,cur,20);bub(235,505,nxt,12);requestAnimationFrame(draw)}
 function nb(r,c){let o=r%2?[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]]:[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]],a=[];o.forEach(v=>{let nr=r+v[0],nc=c+v[1];if(g[nr]&&g[nr][nc]!=null)a.push([nr,nc])});return a}
 function cl(r,c,col,v=new Set()){let k=r+','+c;if(v.has(k))return[];v.add(k);let o=[[r,c]];nb(r,c).forEach(([nr,nc])=>{if(g[nr][nc]===col)o.push(...cl(nr,nc,col,v))});return o}
-function drop(){let con=new Set();for(let c=0;c<g[0].length;c++)if(g[0][c]!=null){let s=[[0,c]];con.add('0,'+c);while(s.length){let [r,cc]=s.pop();nb(r,cc).forEach(([nr,nc])=>{let k=nr+','+nc;if(!con.has(k)&&g[nr][nc]!=null){con.add(k);s.push([nr,nc])}})}}
- for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null&&!con.has(r+','+c)){fall.push({...P(r,c),color:g[r][c]});g[r][c]=null;score+=60}}
-function place(px,py,col){
- let best=null,bd=1e9;for(let r=0;r<9;r++){if(!g[r])g[r]=Array(10-(r%2?1:0)).fill(null);for(let c=0;c<g[r].length;c++)if(g[r][c]==null){let p=P(r,c),d=(p.x-px)**2+(p.y-py)**2;if(d<bd){bd=d;best=[r,c]}}}
- let [r,c]=best;g[r][c]=col;let cc=cl(r,c,col);if(cc.length>=3){cc.forEach(([rr,cc2])=>g[rr][cc2]=null);score+=cc.length*120}
- drop();moves--;document.getElementById('mv').innerText=moves;document.getElementById('sc').innerText=score;document.getElementById('fill').style.width=Math.min(score/2500*100,100)+'%';
- cur=nxt;nxt=rc();if(g.flat().filter(v=>v!=null).length===0)alert('YOU POPPED ALL BUBBLES! 🎉 Score: '+score);
-}
-function shoot(){if(fly)return;let dx=aim.x-180,dy=aim.y-485,l=Math.hypot(dx,dy);dx/=l;dy/=l;fly={x:180,y:485,color:cur,dx:dx*8,dy:dy*8};
- let iv=setInterval(()=>{fly.x+=fly.dx;fly.y+=fly.dy;if(fly.x<R||fly.x>360-R)fly.dx*=-1;if(fly.y<30){place(fly.x,fly.y,fly.color);fly=null;clearInterval(iv);return}
- for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null){let p=P(r,c);if(Math.hypot(p.x-fly.x,p.y-fly.y)<36){place(fly.x,fly.y,fly.color);fly=null;clearInterval(iv);return}}},16)}
-function bomb(){if(bombN<=0)return;bombN--;document.getElementById('bn').innerText=bombN;let n=0;for(let r=2;r<5&&n<8;r++)for(let c=0;c<g[r].length&&n<8;c++)if(g[r][c]!=null){g[r][c]=null;n++;score+=100}drop();document.getElementById('sc').innerText=score}
-function fire(){if(fireN<=0)return;fireN--;document.getElementById('fn').innerText=fireN;for(let c=0;c<g[2].length;c++)g[2][c]=null;drop();score+=500;document.getElementById('sc').innerText=score}
+function drop(){let con=new Set();for(let c=0;c<g[0].length;c++)if(g[0][c]!=null){let s=[[0,c]];con.add('0,'+c);while(s.length){let [r,cc]=s.pop();nb(r,cc).forEach(([nr,nc])=>{let k=nr+','+nc;if(!con.has(k)&&g[nr][nc]!=null){con.add(k);s.push([nr,nc])}})}}for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null&&!con.has(r+','+c)){fall.push({...P(r,c),color:g[r][c]});g[r][c]=null;score+=50}}
+function place(px,py,col){let best=null,bd=1e9;for(let r=0;r<9;r++){if(!g[r])g[r]=Array(10-(r%2?1:0)).fill(null);for(let c=0;c<g[r].length;c++)if(g[r][c]==null){let p=P(r,c),d=(p.x-px)**2+(p.y-py)**2;if(d<bd){bd=d;best=[r,c]}}}let [r,c]=best;g[r][c]=col;let cc=cl(r,c,col);if(cc.length>=3){cc.forEach(([rr,cc2])=>g[rr][cc2]=null);score+=cc.length*100}drop();document.getElementById('sc').innerText=score;cur=nxt;nxt=rc();if(g.flat().filter(v=>v!=null).length===0)alert('JEET GAYE! 🎉 Score: '+score)}
+function shoot(){if(fly)return;let dx=aim.x-180,dy=aim.y-500,l=Math.hypot(dx,dy);dx/=l;dy/=l;fly={x:180,y:500,color:cur,dx:dx*8,dy:dy*8};let iv=setInterval(()=>{fly.x+=fly.dx;fly.y+=fly.dy;if(fly.x<R||fly.x>360-R)fly.dx*=-1;if(fly.y<30){place(fly.x,fly.y,fly.color);fly=null;clearInterval(iv);return}for(let r=0;r<g.length;r++)for(let c=0;c<g[r].length;c++)if(g[r][c]!=null){let p=P(r,c);if(Math.hypot(p.x-fly.x,p.y-fly.y)<36){place(fly.x,fly.y,fly.color);fly=null;clearInterval(iv);return}}},16)}
 cv.addEventListener('pointermove',e=>{let r=cv.getBoundingClientRect();aim.x=e.clientX-r.left;aim.y=e.clientY-r.top;aim.show=true});
-cv.addEventListener('click',shoot);draw();
+cv.addEventListener('pointerup',shoot);draw();
 </script></body></html>
